@@ -3,6 +3,8 @@ package com.dangerye.rpcclient.utils;
 import com.alibaba.fastjson.JSON;
 import com.dangerye.rpcapi.RpcRequest;
 import com.dangerye.rpcapi.RpcResponse;
+import com.dangerye.rpcapi.intf.TestService;
+import com.dangerye.rpcapi.pojo.Model;
 import com.dangerye.rpcclient.client.RpcClient;
 
 import java.lang.reflect.Proxy;
@@ -10,9 +12,15 @@ import java.util.UUID;
 
 public class RpcRemoteUtil {
 
+    public static void main(String[] args) {
+        final TestService testService = RpcRemoteUtil.createRemoteProxy(TestService.class);
+        final Model model = testService.findById(1L);
+        System.out.println(model);
+    }
+
     @SuppressWarnings("unchecked")
     public static <T> T createRemoteProxy(Class<T> serviceClass) {
-        return (T) Proxy.newProxyInstance(serviceClass.getClassLoader(), serviceClass.getInterfaces(),
+        return (T) Proxy.newProxyInstance(serviceClass.getClassLoader(), new Class[]{serviceClass},
                 (proxy, method, args) -> {
                     final RpcRequest rpcRequest = new RpcRequest();
                     rpcRequest.setRequestId(UUID.randomUUID().toString());
