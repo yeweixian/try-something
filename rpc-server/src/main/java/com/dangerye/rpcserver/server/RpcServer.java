@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class RpcServer implements InitializingBean, DisposableBean {
+public class RpcServer implements InitializingBean, DisposableBean, Runnable {
 
     @Autowired
     private RpcConfig rpcConfig;
@@ -27,7 +27,7 @@ public class RpcServer implements InitializingBean, DisposableBean {
     private NioEventLoopGroup workerGroup;
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void run() {
         try {
             masterGroup = new NioEventLoopGroup(1);
             workerGroup = new NioEventLoopGroup();
@@ -59,6 +59,11 @@ public class RpcServer implements InitializingBean, DisposableBean {
                 masterGroup.shutdownGracefully();
             }
         }
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        new Thread(this).start();
     }
 
     @Override
