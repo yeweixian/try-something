@@ -46,7 +46,7 @@ public class RpcClient implements Closeable {
                             @Override
                             protected void channelRead0(ChannelHandlerContext channelHandlerContext, String s) throws Exception {
                                 responseMsg = s;
-                                notify();
+                                notifySelf();
                             }
                         });
                     }
@@ -54,8 +54,16 @@ public class RpcClient implements Closeable {
         final ChannelFuture channelFuture = bootstrap.connect(ip, port).sync();
         channel = channelFuture.channel();
         channel.writeAndFlush(msg);
-        wait();
+        waitSelf();
         return responseMsg;
+    }
+
+    public void waitSelf() throws InterruptedException {
+        this.wait();
+    }
+
+    public void notifySelf() {
+        this.notify();
     }
 
     @Override
