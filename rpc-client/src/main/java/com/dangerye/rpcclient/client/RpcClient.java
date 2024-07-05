@@ -70,9 +70,11 @@ public class RpcClient implements Closeable {
     public void close() throws IOException {
         if (channel != null) {
             channel.close();
+            System.out.println("--- channel close ---");
         }
         if (group != null) {
             group.shutdownGracefully();
+            System.out.println("--- group close ---");
         }
     }
 }
