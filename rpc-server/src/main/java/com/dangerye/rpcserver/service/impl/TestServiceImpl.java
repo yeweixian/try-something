@@ -5,7 +5,9 @@ import com.dangerye.rpcapi.intf.TestService;
 import com.dangerye.rpcapi.pojo.Model;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -24,5 +26,14 @@ public class TestServiceImpl implements TestService {
     @Override
     public Model findById(Long id) {
         return modelMap.get(id);
+    }
+
+    @Override
+    public List<Model> findAll() {
+        final List<Model> list = new ArrayList<>();
+        for (Map.Entry<Long, Model> entry : modelMap.entrySet()) {
+            list.add(entry.getValue());
+        }
+        return list;
     }
 }
