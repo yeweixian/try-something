@@ -11,10 +11,13 @@ import org.apache.commons.lang3.RandomUtils;
 import java.lang.reflect.Proxy;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class RpcRemoteUtil {
 
     public static void main(String[] args) {
+        final ExecutorService executorService = Executors.newCachedThreadPool();
         final TestService testService = RpcRemoteUtil.createRemoteProxy(TestService.class);
         final List<Model> list = testService.findAll();
         System.out.println(list);
@@ -22,10 +25,10 @@ public class RpcRemoteUtil {
         for (int i = 0; i < 256; i++) {
             final int n = i;
             final long l = RandomUtils.nextLong(0, 5);
-            new Thread(() -> {
+            executorService.execute(() -> {
                 final Model model = testService.findById(l == 0 ? null : l);
                 System.out.println("--- thread i: " + n + " --- l: " + l + ", model: " + model);
-            }).start();
+            });
         }
     }
 
