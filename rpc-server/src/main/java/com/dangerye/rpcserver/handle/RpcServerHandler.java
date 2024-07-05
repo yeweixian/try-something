@@ -64,7 +64,8 @@ public class RpcServerHandler extends SimpleChannelInboundHandler<String> implem
         if (parameterTypes != null) {
             parameters = new Object[parameterTypes.length];
             for (int i = 0; i < parameterTypes.length; i++) {
-                parameters[i] = JSON.parseObject(rpcRequest.getParameters()[i].toString(), parameterTypes[i]);
+                final Object parameter = rpcRequest.getParameters()[i];
+                parameters[i] = parameter == null ? null : JSON.parseObject(parameter.toString(), parameterTypes[i]);
             }
         }
         return fastMethod.invoke(springBean, parameters);
