@@ -58,7 +58,15 @@ public class RpcServerHandler extends SimpleChannelInboundHandler<String> implem
             throw new RuntimeException("Not find bean. beanName: " + rpcRequest.getClassName());
         }
         final FastClass fastClass = FastClass.create(springBean.getClass());
-        final FastMethod fastMethod = fastClass.getMethod(rpcRequest.getMethodName(), rpcRequest.getParameterTypes());
-        return fastMethod.invoke(springBean, rpcRequest.getParameters());
+        final Class<?>[] parameterTypes = rpcRequest.getParameterTypes();
+        final FastMethod fastMethod = fastClass.getMethod(rpcRequest.getMethodName(), parameterTypes);
+        Object[] parameters = null;
+        if (parameterTypes != null) {
+            parameters = new Object[parameterTypes.length];
+            for (int i = 0; i < parameterTypes.length; i++) {
+                parameters[i] = JSON.parseObject(rpcRequest.getParameters()[i].toString(), parameterTypes[i]);
+            }
+        }
+        return fastMethod.invoke(springBean, parameters);
     }
 }
