@@ -58,11 +58,11 @@ public class RpcClient implements Closeable {
         return responseMsg;
     }
 
-    public void waitSelf() throws InterruptedException {
+    public synchronized void waitSelf() throws InterruptedException {
         this.wait();
     }
 
-    public void notifySelf() {
+    public synchronized void notifySelf() {
         this.notify();
     }
 
