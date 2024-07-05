@@ -14,7 +14,7 @@ public class RpcRemoteUtil {
 
     public static void main(String[] args) {
         final TestService testService = RpcRemoteUtil.createRemoteProxy(TestService.class);
-        final Model model = testService.findById(1L);
+        final Model model = testService.findById(null);
         System.out.println(model);
     }
 
@@ -35,7 +35,7 @@ public class RpcRemoteUtil {
                             throw new RuntimeException(rpcResponse.getErrorMsg());
                         }
                         final Object result = rpcResponse.getResult();
-                        return JSON.parseObject(result.toString(), method.getReturnType());
+                        return result == null ? null : JSON.parseObject(result.toString(), method.getReturnType());
                     }
                 });
     }
