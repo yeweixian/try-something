@@ -6,16 +6,27 @@ import com.dangerye.rpcapi.RpcResponse;
 import com.dangerye.rpcapi.intf.TestService;
 import com.dangerye.rpcapi.pojo.Model;
 import com.dangerye.rpcclient.client.RpcClient;
+import org.apache.commons.lang3.RandomUtils;
 
 import java.lang.reflect.Proxy;
+import java.util.List;
 import java.util.UUID;
 
 public class RpcRemoteUtil {
 
     public static void main(String[] args) {
         final TestService testService = RpcRemoteUtil.createRemoteProxy(TestService.class);
-        final Model model = testService.findById(null);
-        System.out.println(model);
+        final List<Model> list = testService.findAll();
+        System.out.println(list);
+        System.out.println("------------");
+        for (int i = 0; i < 100; i++) {
+            final int n = i;
+            final long l = RandomUtils.nextLong(0, 3);
+            new Thread(() -> {
+                final Model model = testService.findById(l == 0 ? null : l);
+                System.out.println("--- thread i: " + n + " --- l: " + l + ", model: " + model);
+            }).start();
+        }
     }
 
     @SuppressWarnings("unchecked")
