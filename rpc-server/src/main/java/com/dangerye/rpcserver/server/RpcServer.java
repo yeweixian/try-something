@@ -14,9 +14,11 @@ import io.netty.handler.codec.string.StringEncoder;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 
 @Service
+@EnableConfigurationProperties(RpcConfig.class)
 public class RpcServer implements InitializingBean, DisposableBean, Runnable {
 
     @Autowired
