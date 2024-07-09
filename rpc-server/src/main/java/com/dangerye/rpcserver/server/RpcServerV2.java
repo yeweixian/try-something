@@ -44,8 +44,8 @@ public class RpcServerV2 implements InitializingBean, DisposableBean, Runnable {
                         @Override
                         protected void initChannel(Channel channel) throws Exception {
                             final ChannelPipeline pipeline = channel.pipeline();
-                            pipeline.addLast(new RpcEncoder(RpcRequest.class, new JsonRpcSerializer()));
-                            pipeline.addLast(new RpcDecoder(RpcResponse.class, new JsonRpcSerializer()));
+                            pipeline.addLast(new RpcEncoder(RpcResponse.class, new JsonRpcSerializer()));
+                            pipeline.addLast(new RpcDecoder(RpcRequest.class, new JsonRpcSerializer()));
                             pipeline.addLast(rpcServerHandlerV2);
                         }
                     });
