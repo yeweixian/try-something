@@ -1,6 +1,7 @@
 package com.dangerye.mywechatserver.server;
 
 import com.dangerye.mywechatserver.config.WeChatConfig;
+import com.dangerye.mywechatserver.handle.WeChatHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -26,6 +27,8 @@ public class WeChatServer implements InitializingBean, DisposableBean, Runnable 
 
     @Autowired
     private WeChatConfig weChatConfig;
+    @Autowired
+    private WeChatHandler weChatHandler;
     private NioEventLoopGroup masterGroup;
     private NioEventLoopGroup workerGroup;
 
