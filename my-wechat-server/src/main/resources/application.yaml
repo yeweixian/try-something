@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: my-wechat-server
+  thymeleaf:
+    cache: false
+    checktemplatelocation: true
+    enabled: true
+    encoding: UTF-8
+    mode: HTML5
+    prefix: classpath:/templates/
+    suffix: .html
+server:
+  port: 8080
+netty:
+  port: 8081
+  path: /chat
+resources:
+  static-locations:
+    - classpath:/static/
