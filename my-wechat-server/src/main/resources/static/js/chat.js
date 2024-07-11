@@ -20,11 +20,10 @@ $(function () {
     ws.onmessage = function (evt) {
         showMessage(evt.data);
     }
-    ws.onclose = function (){
+    ws.onclose = function () {
         console.log("连接关闭")
     }
-
-    ws.onerror = function (){
+    ws.onerror = function () {
         console.log("连接异常")
     }
 
