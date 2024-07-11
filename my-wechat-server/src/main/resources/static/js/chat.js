@@ -15,7 +15,8 @@ $(function () {
 
     var ws = new WebSocket("ws://localhost:8081/chat");
     ws.onopen = function () {
-        console.log("连接成功.")
+        console.log("连接成功.");
+        ws.send(username + ":我来了！");
     }
     ws.onmessage = function (evt) {
         showMessage(evt.data);
