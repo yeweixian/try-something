@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.dangerye.rpcapi.RpcRequest;
 import com.dangerye.rpcapi.RpcResponse;
 import com.dangerye.rpcclient.client.RpcClient;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.curator.framework.CuratorFramework;
@@ -40,6 +41,7 @@ public class RpcRemoteClientUtil implements InitializingBean, DisposableBean {
                     rpcRequest.setParameters(args);
                     final long beginTime = System.currentTimeMillis();
                     final String responseMsg = rpcClient.send(JSON.toJSONString(rpcRequest));
+                    Thread.sleep(RandomUtils.nextInt(50, 250));
                     reportCallMsg(rpcClient.getService(), beginTime, System.currentTimeMillis());
                     final RpcResponse rpcResponse = JSON.parseObject(responseMsg, RpcResponse.class);
                     if (rpcResponse.getErrorMsg() != null) {

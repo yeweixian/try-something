@@ -8,11 +8,11 @@ import com.dangdang.ddframe.job.lite.api.JobScheduler;
 import com.dangdang.ddframe.job.lite.config.LiteJobConfiguration;
 import com.dangdang.ddframe.job.reg.zookeeper.ZookeeperConfiguration;
 import com.dangdang.ddframe.job.reg.zookeeper.ZookeeperRegistryCenter;
+import com.dangerye.rpcclient.config.BeansConfig;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -21,9 +21,6 @@ import java.util.List;
 
 @Component
 public class CallReportJob implements InitializingBean, SimpleJob {
-
-    @Autowired
-    private CuratorFramework zookeeperCuratorFramework;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -44,6 +41,8 @@ public class CallReportJob implements InitializingBean, SimpleJob {
     public void execute(ShardingContext shardingContext) {
         final long nowTime = System.currentTimeMillis();
         try {
+            final CuratorFramework zookeeperCuratorFramework = BeansConfig.getApplicationContext()
+                    .getBean("zookeeperCuratorFramework", CuratorFramework.class);
             final List<String> nodeList = zookeeperCuratorFramework.getChildren().forPath("/");
             if (CollectionUtils.isEmpty(nodeList)) {
                 return;
