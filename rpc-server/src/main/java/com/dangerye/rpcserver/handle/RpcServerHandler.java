@@ -49,7 +49,7 @@ public class RpcServerHandler extends SimpleChannelInboundHandler<String> implem
             e.printStackTrace();
             rpcResponse.setErrorMsg(e.getMessage());
         }
-        channelHandlerContext.writeAndFlush(JSON.toJSONString(rpcResponse) + "\n");
+        channelHandlerContext.writeAndFlush(JSON.toJSONString(rpcResponse));
     }
 
     private Object handle(RpcRequest rpcRequest) throws Exception {

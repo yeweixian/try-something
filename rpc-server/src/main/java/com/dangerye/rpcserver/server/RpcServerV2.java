@@ -68,7 +68,7 @@ public class RpcServerV2 implements InitializingBean, DisposableBean, Runnable {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        new Thread(this).start();
+        // new Thread(this).start();
     }
 
     @Override
