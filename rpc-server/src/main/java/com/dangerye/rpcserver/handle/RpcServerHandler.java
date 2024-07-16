@@ -40,6 +40,7 @@ public class RpcServerHandler extends SimpleChannelInboundHandler<String> implem
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, String s) throws Exception {
+        System.out.println(s);
         final RpcRequest rpcRequest = JSON.parseObject(s, RpcRequest.class);
         final RpcResponse rpcResponse = new RpcResponse();
         rpcResponse.setRequestId(rpcRequest.getRequestId());

@@ -41,8 +41,8 @@ public class RpcRemoteClientUtil implements InitializingBean, DisposableBean {
                     rpcRequest.setParameters(args);
                     final long beginTime = System.currentTimeMillis();
                     final String responseMsg = rpcClient.send(JSON.toJSONString(rpcRequest));
-                    Thread.sleep(RandomUtils.nextInt(50, 250));
-                    reportCallMsg(rpcClient.getService(), beginTime, System.currentTimeMillis());
+                    final long endTime = beginTime + (RandomUtils.nextInt(500, 1000));
+                    reportCallMsg(rpcClient.getService(), beginTime, endTime);
                     final RpcResponse rpcResponse = JSON.parseObject(responseMsg, RpcResponse.class);
                     if (rpcResponse.getErrorMsg() != null) {
                         throw new RuntimeException(rpcResponse.getErrorMsg());
@@ -52,7 +52,7 @@ public class RpcRemoteClientUtil implements InitializingBean, DisposableBean {
                 });
     }
 
-    private RpcClient loadBalancingRpcClient() throws Exception {
+    private synchronized RpcClient loadBalancingRpcClient() throws Exception {
         if (rpcClientMap.size() > 0) {
             long baseTime = Long.MAX_VALUE;
             RpcClient rpcClient = null;
