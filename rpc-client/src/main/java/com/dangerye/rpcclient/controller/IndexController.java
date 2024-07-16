@@ -32,7 +32,7 @@ public class IndexController {
             final long l = RandomUtils.nextLong(0, 5);
             executorService.execute(() -> {
                 final Model model = testService.findById(l == 0 ? null : l);
-                System.out.println("--- thread i: " + n + " --- l: " + l + ", model: " + model);
+                System.out.println("--- thread i: " + n + " --- check id: " + l + ", result: " + model);
             });
         }
         return "hello world!";

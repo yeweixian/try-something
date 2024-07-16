@@ -95,7 +95,7 @@ public class RpcRemoteClientUtil implements InitializingBean, DisposableBean {
         pathChildrenCache.getListenable()
                 .addListener((cf, ce) -> {
                     final PathChildrenCacheEvent.Type type = ce.getType();
-                    System.out.println("event type: " + type);
+                    // System.out.println("event type: " + type);
                     if (PathChildrenCacheEvent.Type.CHILD_ADDED.equals(type)) {
                         final String path = ce.getData().getPath();
                         System.out.println("act node: " + path);
