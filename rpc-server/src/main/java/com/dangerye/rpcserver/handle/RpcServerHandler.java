@@ -40,6 +40,7 @@ public class RpcServerHandler extends SimpleChannelInboundHandler<String> implem
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, String s) throws Exception {
+        System.out.println(s);
         final RpcRequest rpcRequest = JSON.parseObject(s, RpcRequest.class);
         final RpcResponse rpcResponse = new RpcResponse();
         rpcResponse.setRequestId(rpcRequest.getRequestId());
@@ -49,7 +50,7 @@ public class RpcServerHandler extends SimpleChannelInboundHandler<String> implem
             e.printStackTrace();
             rpcResponse.setErrorMsg(e.getMessage());
         }
-        channelHandlerContext.writeAndFlush(JSON.toJSONString(rpcResponse));
+        channelHandlerContext.writeAndFlush(JSON.toJSONString(rpcResponse) + "\n");
     }
 
     private Object handle(RpcRequest rpcRequest) throws Exception {

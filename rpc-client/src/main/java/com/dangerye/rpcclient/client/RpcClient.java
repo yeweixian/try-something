@@ -10,6 +10,7 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 
@@ -50,6 +51,7 @@ public class RpcClient implements Closeable {
                     @Override
                     protected void initChannel(Channel channel) throws Exception {
                         final ChannelPipeline pipeline = channel.pipeline();
+                        pipeline.addLast(new LineBasedFrameDecoder(4096));
                         pipeline.addLast(new StringEncoder());
                         pipeline.addLast(new StringDecoder());
                         pipeline.addLast(new SimpleChannelInboundHandler<String>() {
@@ -66,7 +68,7 @@ public class RpcClient implements Closeable {
     }
 
     public String send(String msg) throws Exception {
-        channel.writeAndFlush(msg);
+        channel.writeAndFlush(msg + "\n");
         waitSelf();
         return responseMsg;
     }
