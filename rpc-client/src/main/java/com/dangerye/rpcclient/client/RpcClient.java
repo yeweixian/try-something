@@ -83,4 +83,8 @@ public class RpcClient implements Closeable {
             System.out.println("--- group close ---");
         }
     }
+
+    public void tryClose() {
+        System.out.println("client close. service: " + ip + ":" + port);
+    }
 }
