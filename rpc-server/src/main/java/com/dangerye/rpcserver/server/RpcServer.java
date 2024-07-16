@@ -1,5 +1,6 @@
 package com.dangerye.rpcserver.server;
 
+import com.dangerye.rpcapi.utils.IpUtil;
 import com.dangerye.rpcserver.config.RpcConfig;
 import com.dangerye.rpcserver.handle.RpcServerHandler;
 import io.netty.bootstrap.ServerBootstrap;
@@ -11,16 +12,22 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.zookeeper.CreateMode;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
+
 @Service
 @EnableConfigurationProperties(RpcConfig.class)
 public class RpcServer implements InitializingBean, DisposableBean, Runnable {
 
+    @Autowired
+    private CuratorFramework zookeeperCuratorFramework;
     @Autowired
     private RpcConfig rpcConfig;
     @Autowired
@@ -48,6 +55,7 @@ public class RpcServer implements InitializingBean, DisposableBean, Runnable {
                     });
             int port = rpcConfig.getPort() != null ? rpcConfig.getPort() : 9090;
             final ChannelFuture channelFuture = serverBootstrap.bind(port).sync();
+            reportServerMsg(IpUtil.getLocalIp(), port);
             System.out.println("------ rpc server start success ------");
             System.out.println("------ rpc server port: " + port + " ------");
             channelFuture.channel().closeFuture().sync();
@@ -60,6 +68,17 @@ public class RpcServer implements InitializingBean, DisposableBean, Runnable {
             if (masterGroup != null) {
                 masterGroup.shutdownGracefully();
             }
+        }
+    }
+
+    private void reportServerMsg(String localIp, int port) {
+        try {
+            zookeeperCuratorFramework.create()
+                    .creatingParentsIfNeeded()
+                    .withMode(CreateMode.EPHEMERAL)
+                    .forPath("/" + localIp + ":" + port, "".getBytes(StandardCharsets.UTF_8));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
