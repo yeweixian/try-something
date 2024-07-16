@@ -27,12 +27,13 @@ public class RpcClientV2 implements Closeable {
     private Channel channel;
     private RpcResponse rpcResponse;
 
-    public RpcClientV2(String ip, int port) {
+    public RpcClientV2(String ip, int port) throws Exception {
         this.ip = ip;
         this.port = port;
+        connectionServer();
     }
 
-    public RpcResponse send(RpcRequest rpcRequest) throws Exception {
+    private void connectionServer() throws Exception {
         group = new NioEventLoopGroup();
         final Bootstrap bootstrap = new Bootstrap();
         bootstrap.group(group)
@@ -56,6 +57,9 @@ public class RpcClientV2 implements Closeable {
                 });
         final ChannelFuture channelFuture = bootstrap.connect(ip, port).sync();
         channel = channelFuture.channel();
+    }
+
+    public RpcResponse send(RpcRequest rpcRequest) throws Exception {
         channel.writeAndFlush(rpcRequest);
         waitSelf();
         return rpcResponse;

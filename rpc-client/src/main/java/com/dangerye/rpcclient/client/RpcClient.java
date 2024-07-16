@@ -24,12 +24,13 @@ public class RpcClient implements Closeable {
     private Channel channel;
     private String responseMsg;
 
-    public RpcClient(String ip, int port) {
+    public RpcClient(String ip, int port) throws Exception {
         this.ip = ip;
         this.port = port;
+        connectionServer();
     }
 
-    public Object send(String msg) throws Exception {
+    private void connectionServer() throws Exception {
         group = new NioEventLoopGroup();
         final Bootstrap bootstrap = new Bootstrap();
         bootstrap.group(group)
@@ -53,6 +54,9 @@ public class RpcClient implements Closeable {
                 });
         final ChannelFuture channelFuture = bootstrap.connect(ip, port).sync();
         channel = channelFuture.channel();
+    }
+
+    public String send(String msg) throws Exception {
         channel.writeAndFlush(msg);
         waitSelf();
         return responseMsg;
