@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.dangerye.rpcapi.RpcRequest;
 import com.dangerye.rpcapi.RpcResponse;
 import com.dangerye.rpcclient.client.RpcClient;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
@@ -49,7 +50,31 @@ public class RpcRemoteClientUtil implements InitializingBean, DisposableBean {
                 });
     }
 
-    private RpcClient loadBalancingRpcClient() {
+    private RpcClient loadBalancingRpcClient() throws Exception {
+        if (rpcClientMap.size() > 0) {
+            long baseTime = Long.MAX_VALUE;
+            RpcClient rpcClient = null;
+            for (Map.Entry<String, RpcClient> entry : rpcClientMap.entrySet()) {
+                final byte[] bytes = zookeeperCuratorFramework.getData().forPath("/" + entry.getKey());
+                if (bytes == null) {
+                    return entry.getValue();
+                }
+                final String nodeMsg = new String(bytes);
+                if (StringUtils.isBlank(nodeMsg)) {
+                    return entry.getValue();
+                }
+                final String[] split = nodeMsg.split("\\|");
+                final long useTime = NumberUtils.toLong(split[1]);
+                if (useTime < baseTime) {
+                    baseTime = useTime;
+                    rpcClient = entry.getValue();
+                }
+            }
+            if (rpcClient != null) {
+                return rpcClient;
+            }
+        }
+        throw new RuntimeException("no provider service");
     }
 
     private void reportCallMsg(String service, long beginTime, long endTime) {
