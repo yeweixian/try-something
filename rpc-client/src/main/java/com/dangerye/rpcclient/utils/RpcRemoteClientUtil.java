@@ -1,5 +1,8 @@
 package com.dangerye.rpcclient.utils;
 
+import com.alibaba.fastjson.JSON;
+import com.dangerye.rpcapi.RpcRequest;
+import com.dangerye.rpcapi.RpcResponse;
 import com.dangerye.rpcclient.client.RpcClient;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.curator.framework.CuratorFramework;
@@ -10,7 +13,10 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.Proxy;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
@@ -19,6 +25,42 @@ public class RpcRemoteClientUtil implements InitializingBean, DisposableBean {
     private final ConcurrentHashMap<String, RpcClient> rpcClientMap = new ConcurrentHashMap<>();
     @Autowired
     private CuratorFramework zookeeperCuratorFramework;
+
+    @SuppressWarnings("unchecked")
+    public final <T> T createRemoteProxy(Class<T> serviceClass) {
+        return (T) Proxy.newProxyInstance(serviceClass.getClassLoader(), new Class[]{serviceClass},
+                (proxy, method, args) -> {
+                    final RpcClient rpcClient = loadBalancingRpcClient();
+                    final RpcRequest rpcRequest = new RpcRequest();
+                    rpcRequest.setRequestId(UUID.randomUUID().toString());
+                    rpcRequest.setClassName(method.getDeclaringClass().getName());
+                    rpcRequest.setMethodName(method.getName());
+                    rpcRequest.setParameterTypes(method.getParameterTypes());
+                    rpcRequest.setParameters(args);
+                    final long beginTime = System.currentTimeMillis();
+                    final String responseMsg = rpcClient.send(JSON.toJSONString(rpcRequest));
+                    reportCallMsg(rpcClient.getService(), beginTime, System.currentTimeMillis());
+                    final RpcResponse rpcResponse = JSON.parseObject(responseMsg, RpcResponse.class);
+                    if (rpcResponse.getErrorMsg() != null) {
+                        throw new RuntimeException(rpcResponse.getErrorMsg());
+                    }
+                    final Object result = rpcResponse.getResult();
+                    return result == null ? null : JSON.parseObject(result.toString(), method.getReturnType());
+                });
+    }
+
+    private RpcClient loadBalancingRpcClient() {
+    }
+
+    private void reportCallMsg(String service, long beginTime, long endTime) {
+        try {
+            final long useTime = endTime - beginTime;
+            zookeeperCuratorFramework.setData()
+                    .forPath("/" + service, (endTime + "|" + useTime).getBytes(StandardCharsets.UTF_8));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -48,6 +90,7 @@ public class RpcRemoteClientUtil implements InitializingBean, DisposableBean {
         try {
             final String[] split = service.split(":");
             final RpcClient rpcClient = new RpcClient(split[0], NumberUtils.toInt(split[1]));
+            rpcClient.setService(service);
             rpcClientMap.putIfAbsent(service, rpcClient);
         } catch (Exception e) {
             e.printStackTrace();

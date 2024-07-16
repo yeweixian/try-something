@@ -13,6 +13,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
+import org.apache.commons.lang3.RandomUtils;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -21,6 +22,7 @@ public class RpcClient implements Closeable {
 
     private final String ip;
     private final int port;
+    private String service;
     private NioEventLoopGroup group;
     private Channel channel;
     private String responseMsg;
@@ -29,6 +31,14 @@ public class RpcClient implements Closeable {
         this.ip = ip;
         this.port = port;
         connectionServer();
+    }
+
+    public String getService() {
+        return service;
+    }
+
+    public void setService(String service) {
+        this.service = service;
     }
 
     private void connectionServer() throws Exception {
@@ -61,6 +71,7 @@ public class RpcClient implements Closeable {
     public String send(String msg) throws Exception {
         channel.writeAndFlush(msg + "\n");
         waitSelf();
+        Thread.sleep(RandomUtils.nextInt(50, 250));
         return responseMsg;
     }
 
