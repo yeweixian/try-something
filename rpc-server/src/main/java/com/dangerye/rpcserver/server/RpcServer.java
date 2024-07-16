@@ -10,6 +10,7 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import org.apache.curator.framework.CuratorFramework;
@@ -50,6 +51,7 @@ public class RpcServer implements InitializingBean, DisposableBean, Runnable {
                             final ChannelPipeline pipeline = channel.pipeline();
                             pipeline.addLast(new StringEncoder());
                             pipeline.addLast(new StringDecoder());
+                            pipeline.addLast(new LineBasedFrameDecoder(4096));
                             pipeline.addLast(rpcServerHandler);
                         }
                     });
