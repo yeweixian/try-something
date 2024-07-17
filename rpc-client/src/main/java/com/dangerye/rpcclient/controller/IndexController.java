@@ -27,7 +27,7 @@ public class IndexController {
         final List<Model> all = testService.findAll();
         System.out.println(all);
         System.out.println("------------");
-        for (int i = 0; i < 10240; i++) {
+        for (int i = 0; i < 512; i++) {
             // final int n = i;
             final long l = RandomUtils.nextLong(0, 5);
             executorService.execute(() -> {
