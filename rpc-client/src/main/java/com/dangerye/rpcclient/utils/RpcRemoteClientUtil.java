@@ -41,8 +41,8 @@ public class RpcRemoteClientUtil implements InitializingBean, DisposableBean {
                     rpcRequest.setParameters(args);
                     final long beginTime = System.currentTimeMillis();
                     final String responseMsg = rpcClient.send(JSON.toJSONString(rpcRequest));
-                    final long endTime = beginTime + (RandomUtils.nextInt(500, 1000));
-                    reportCallMsg(rpcClient.getService(), beginTime, endTime);
+                    Thread.sleep(RandomUtils.nextLong(500, 1000));
+                    reportCallMsg(rpcClient.getService(), beginTime, System.currentTimeMillis());
                     final RpcResponse rpcResponse = JSON.parseObject(responseMsg, RpcResponse.class);
                     if (rpcResponse.getErrorMsg() != null) {
                         throw new RuntimeException(rpcResponse.getErrorMsg());
@@ -52,7 +52,7 @@ public class RpcRemoteClientUtil implements InitializingBean, DisposableBean {
                 });
     }
 
-    private synchronized RpcClient loadBalancingRpcClient() throws Exception {
+    private RpcClient loadBalancingRpcClient() throws Exception {
         if (rpcClientMap.size() > 0) {
             long baseTime = Long.MAX_VALUE;
             RpcClient rpcClient = null;
@@ -98,11 +98,11 @@ public class RpcRemoteClientUtil implements InitializingBean, DisposableBean {
                     // System.out.println("event type: " + type);
                     if (PathChildrenCacheEvent.Type.CHILD_ADDED.equals(type)) {
                         final String path = ce.getData().getPath();
-                        System.out.println("act node: " + path);
+                        System.out.println("add node: " + path);
                         connectProviderService(path.substring(1));
                     } else if (PathChildrenCacheEvent.Type.CHILD_REMOVED.equals(type)) {
                         final String path = ce.getData().getPath();
-                        System.out.println("act node: " + path);
+                        System.out.println("remove node: " + path);
                         disconnectProviderService(path.substring(1));
                     }
                 });
@@ -126,7 +126,9 @@ public class RpcRemoteClientUtil implements InitializingBean, DisposableBean {
 
     private void disconnectProviderService(String service) {
         try (final RpcClient rpcClient = rpcClientMap.remove(service)) {
-            rpcClient.tryClose();
+            if (rpcClient != null) {
+                rpcClient.tryClose();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -27,17 +27,18 @@ public class IndexController {
         final List<Model> all = testService.findAll();
         System.out.println(all);
         System.out.println("------------");
-        for (int i = 0; i < 1024; i++) {
-            final int n = i;
+        for (int i = 0; i < 10240; i++) {
+            // final int n = i;
             final long l = RandomUtils.nextLong(0, 5);
             executorService.execute(() -> {
                 try {
-                    Thread.sleep(RandomUtils.nextLong(1000, 10000));
+                    Thread.sleep(RandomUtils.nextLong(1000, 30000));
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
-                final Model model = testService.findById(l == 0 ? null : l);
-                System.out.println("--- thread i: " + n + " --- check id: " + l + ", result: " + model);
+                testService.findById(l == 0 ? null : l);
+                // final Model model = testService.findById(l == 0 ? null : l);
+                // System.out.println("--- thread i: " + n + " --- check id: " + l + ", result: " + model);
             });
         }
         return "hello world!";
