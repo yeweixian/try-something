@@ -1,0 +1,2 @@
+service1=com.dangerye.service.impl.HelloServiceImpl1
+service2=com.dangerye.service.impl.HelloServiceImpl2
