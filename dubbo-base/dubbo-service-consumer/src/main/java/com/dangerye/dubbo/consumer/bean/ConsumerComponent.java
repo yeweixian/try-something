@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ConsumerComponent {
-    @Reference
+    @Reference(loadbalance = "")
     private HelloService helloService;
 
     public String sayHello(String name) {

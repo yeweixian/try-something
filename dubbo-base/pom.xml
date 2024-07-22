@@ -16,6 +16,7 @@
         <module>dubbo-spi-impl</module>
         <module>dubbo-spi-main</module>
         <module>dubbo-spi-filter</module>
+        <module>dubbo-spi-loadbalance</module>
     </modules>
 
     <properties>
