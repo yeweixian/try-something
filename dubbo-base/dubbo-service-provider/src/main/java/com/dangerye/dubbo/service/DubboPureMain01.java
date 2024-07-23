@@ -10,19 +10,19 @@ import org.springframework.context.annotation.PropertySource;
 
 import java.io.IOException;
 
-public class DubboPureMain {
+public class DubboPureMain01 {
     public static void main(String[] args) throws IOException {
         final AnnotationConfigApplicationContext context
-                = new AnnotationConfigApplicationContext(ProviderConfiguration.class);
+                = new AnnotationConfigApplicationContext(ProviderConfiguration01.class);
         context.start();
         System.in.read();
     }
 
     @Configuration
-    @PropertySource("classpath:/dubbo-provider.properties")
+    @PropertySource("classpath:/dubbo-provider01.properties")
     @ComponentScan(basePackages = "com.dangerye.dubbo.service")
     @EnableDubbo(scanBasePackages = "com.dangerye.dubbo.service.impl")
-    public static class ProviderConfiguration {
+    public static class ProviderConfiguration01 {
         @Bean
         public RegistryConfig registryConfig() {
             final RegistryConfig registryConfig = new RegistryConfig();
