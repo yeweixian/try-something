@@ -29,6 +29,7 @@ public class RestartingInstanceRouter implements Router {
                 .filter(invoker -> {
                     final String applicationName = invoker.getUrl().getParameter("remote.application");
                     final String host = invoker.getUrl().getIp();
+                    System.out.println("applicationName: " + applicationName + " host: " + host);
                     return !INSTANCES.isRestartingInstance(applicationName, host);
                 }).collect(Collectors.toList());
     }
