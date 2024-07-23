@@ -14,6 +14,7 @@ public class OnlyFirstLoadBalance implements LoadBalance {
     public <T> Invoker<T> select(List<Invoker<T>> invokers, URL url, Invocation invocation) throws RpcException {
         final int size = invokers.size();
         final int i = RandomUtils.nextInt(0, size);
+        System.out.println("OnlyFirstLoadBalance: total invoker: " + size + " Random: " + i);
         return invokers.get(i);
     }
 }
