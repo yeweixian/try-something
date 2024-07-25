@@ -15,7 +15,7 @@ public class Main {
             System.out.println("result: " + result);
         }
         System.out.println("------------");
-        final URL url = URL.valueOf("test://localhost/hello?hello.service=service2");
+        final URL url = URL.valueOf("test://localhost/hello?helloService=service2");
         final ExtensionLoader<HelloService> urlExtLoader = ExtensionLoader.getExtensionLoader(HelloService.class);
         final HelloService adaptiveExtension = urlExtLoader.getAdaptiveExtension();
         final String result = adaptiveExtension.sayHello(url, "adaptive main");

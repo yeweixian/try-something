@@ -8,6 +8,6 @@ import org.apache.dubbo.common.extension.SPI;
 public interface HelloService {
     String sayHello(String name);
 
-    @Adaptive
+    @Adaptive("helloService")
     String sayHello(URL url, String name);
 }
