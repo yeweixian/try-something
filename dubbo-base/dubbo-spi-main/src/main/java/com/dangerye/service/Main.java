@@ -14,6 +14,8 @@ public class Main {
             final String result = extension.sayHello("main");
             System.out.println("result: " + result);
         }
+        // final HelloService helloService = extensionLoader.getExtension("true");    // true 为 获取 默认执行器
+        // System.out.println("helloService result: " + helloService.sayHello("true"));
         System.out.println("------------");
         final URL url = URL.valueOf("test://localhost/hello?helloService=service2");
         final ExtensionLoader<HelloService> urlExtLoader = ExtensionLoader.getExtensionLoader(HelloService.class);
