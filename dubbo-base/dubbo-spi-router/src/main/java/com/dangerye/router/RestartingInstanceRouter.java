@@ -11,10 +11,11 @@ import java.util.stream.Collectors;
 
 public class RestartingInstanceRouter implements Router {
 
-    private static final ReadyRestartInstances INSTANCES = ReadyRestartInstances.getInstance();
+    private final ReadyRestartInstances readyRestartInstances;
     private final URL url;
 
     public RestartingInstanceRouter(URL url) {
+        this.readyRestartInstances = ReadyRestartInstances.getInstance();
         this.url = url;
     }
 
@@ -30,7 +31,7 @@ public class RestartingInstanceRouter implements Router {
                     final String applicationName = invoker.getUrl().getParameter("remote.application");
                     final String host = invoker.getUrl().getIp();
                     System.out.println("applicationName: " + applicationName + " host: " + host);
-                    return !INSTANCES.isRestartingInstance(applicationName, host);
+                    return !readyRestartInstances.isRestartingInstance(applicationName, host);
                 }).collect(Collectors.toList());
     }
 
