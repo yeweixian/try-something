@@ -5,6 +5,7 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
+import org.apache.dubbo.common.utils.Holder;
 import org.apache.zookeeper.data.Stat;
 import org.springframework.util.CollectionUtils;
 
@@ -14,58 +15,57 @@ import java.util.List;
 import java.util.Set;
 
 @Slf4j
-public class ReadyRestartInstances implements PathChildrenCacheListener {
+public final class ReadyRestartInstances implements PathChildrenCacheListener {
 
     private static final String LISTEN_PATH = "/dubbo/restart/instances";
-    private static final CuratorFramework ZKCLIENT;
-    private static final ReadyRestartInstances INSTANCES;
-
-    static {
-        ZKCLIENT = ZookeeperUtil.getClient();
-        INSTANCES = new ReadyRestartInstances();
-        try {
-            final Stat stat = ZKCLIENT.checkExists().forPath(LISTEN_PATH);
-            if (stat == null) {
-                ZKCLIENT.create()
-                        .creatingParentsIfNeeded()
-                        .forPath(LISTEN_PATH);
-            }
-            final PathChildrenCache pathChildrenCache = new PathChildrenCache(ZKCLIENT, LISTEN_PATH, true);
-            pathChildrenCache.getListenable().addListener(INSTANCES);
-            pathChildrenCache.start(PathChildrenCache.StartMode.POST_INITIALIZED_EVENT);
-        } catch (Exception e) {
-            e.printStackTrace();
-            log.error("ReadyRestartInstances init error.", e);
-        }
-    }
-
+    private static final Holder<ReadyRestartInstances> EXAMPLE = new Holder<>();
+    private final CuratorFramework zkClient;
     private volatile Set<String> nodeNameSet = Collections.emptySet();
 
-    private ReadyRestartInstances() {
+    private ReadyRestartInstances(CuratorFramework zkClient) {
+        this.zkClient = zkClient;
     }
 
     public static ReadyRestartInstances getInstance() {
-        return INSTANCES;
+        final ReadyRestartInstances tryGet = EXAMPLE.get();
+        if (tryGet == null) {
+            synchronized (EXAMPLE) {
+                final ReadyRestartInstances doubleTry = EXAMPLE.get();
+                if (doubleTry == null) {
+                    final ReadyRestartInstances instance = createInstance();
+                    EXAMPLE.set(instance);
+                    return instance;
+                } else {
+                    return doubleTry;
+                }
+            }
+        } else {
+            return tryGet;
+        }
     }
 
-    private String buildNodeName(String applicationName, String host) {
-        return applicationName + "_" + host;
+    private static ReadyRestartInstances createInstance() {
+        final CuratorFramework client = ZookeeperUtil.getClient();
+        final ReadyRestartInstances instances = new ReadyRestartInstances(client);
+        instances.createZkListener();
+        return instances;
     }
 
-    public void addRestartingInstance(String applicationName, String host) throws Exception {
-        ZKCLIENT.create()
-                .creatingParentsIfNeeded()
-                .forPath(LISTEN_PATH + "/" + buildNodeName(applicationName, host));
-    }
-
-    public void removeRestartingInstance(String applicationName, String host) throws Exception {
-        ZKCLIENT.delete()
-                .deletingChildrenIfNeeded()
-                .forPath(LISTEN_PATH + "/" + buildNodeName(applicationName, host));
-    }
-
-    public boolean isRestartingInstance(String applicationName, String host) {
-        return nodeNameSet.contains(buildNodeName(applicationName, host));
+    private void createZkListener() {
+        try {
+            final Stat stat = zkClient.checkExists().forPath(LISTEN_PATH);
+            if (stat == null) {
+                zkClient.create()
+                        .creatingParentsIfNeeded()
+                        .forPath(LISTEN_PATH);
+            }
+            final PathChildrenCache pathChildrenCache = new PathChildrenCache(zkClient, LISTEN_PATH, true);
+            pathChildrenCache.getListenable().addListener(this);
+            pathChildrenCache.start(PathChildrenCache.StartMode.POST_INITIALIZED_EVENT);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("ReadyRestartInstances createZkListener error.", e);
+        }
     }
 
     @Override
@@ -77,5 +77,25 @@ public class ReadyRestartInstances implements PathChildrenCacheListener {
         } else {
             nodeNameSet = new HashSet<>(nodeNameList);
         }
+    }
+
+    public boolean isRestartingInstance(String applicationName, String host) {
+        return nodeNameSet.contains(buildNodeName(applicationName, host));
+    }
+
+    public void addRestartingInstance(String applicationName, String host) throws Exception {
+        zkClient.create()
+                .creatingParentsIfNeeded()
+                .forPath(LISTEN_PATH + "/" + buildNodeName(applicationName, host));
+    }
+
+    public void removeRestartingInstance(String applicationName, String host) throws Exception {
+        zkClient.delete()
+                .deletingChildrenIfNeeded()
+                .forPath(LISTEN_PATH + "/" + buildNodeName(applicationName, host));
+    }
+
+    private String buildNodeName(String applicationName, String host) {
+        return applicationName + "_" + host;
     }
 }
