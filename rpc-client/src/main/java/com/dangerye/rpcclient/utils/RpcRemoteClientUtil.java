@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RpcRemoteClientUtil implements InitializingBean, DisposableBean {
 
     private final ConcurrentHashMap<String, RpcClient> rpcClientMap = new ConcurrentHashMap<>();
-    private final CuratorFramework zkClient = SingletonLoader.getInstance(ZookeeperUtil.class).getMyRPCServicesZkClient();
+    private final ZookeeperUtil zookeeperUtil = SingletonLoader.getInstance(ZookeeperUtil.class);
 
     @SuppressWarnings("unchecked")
     public final <T> T createRemoteProxy(Class<T> serviceClass) {
@@ -56,6 +56,7 @@ public class RpcRemoteClientUtil implements InitializingBean, DisposableBean {
         if (rpcClientMap.size() > 0) {
             long baseTime = Long.MAX_VALUE;
             RpcClient rpcClient = null;
+            final CuratorFramework zkClient = zookeeperUtil.getMyRPCServicesZkClient();
             for (Map.Entry<String, RpcClient> entry : rpcClientMap.entrySet()) {
                 final byte[] bytes = zkClient.getData().forPath("/" + entry.getKey());
                 if (bytes == null) {
@@ -81,6 +82,7 @@ public class RpcRemoteClientUtil implements InitializingBean, DisposableBean {
 
     private void reportCallMsg(String service, long beginTime, long endTime) {
         try {
+            final CuratorFramework zkClient = zookeeperUtil.getMyRPCServicesZkClient();
             final long useTime = endTime - beginTime;
             zkClient.setData()
                     .forPath("/" + service, (endTime + "|" + useTime).getBytes(StandardCharsets.UTF_8));
@@ -91,6 +93,7 @@ public class RpcRemoteClientUtil implements InitializingBean, DisposableBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        final CuratorFramework zkClient = zookeeperUtil.getMyRPCServicesZkClient();
         final PathChildrenCache pathChildrenCache = new PathChildrenCache(zkClient, "/", true);
         pathChildrenCache.getListenable()
                 .addListener((cf, ce) -> {

@@ -1,11 +1,13 @@
 package com.dangerye.router;
 
+import com.dangerye.base.utils.Loader;
+import com.dangerye.base.utils.SingletonLoader;
+import com.dangerye.base.utils.ZookeeperUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
-import org.apache.dubbo.common.utils.Holder;
 import org.apache.zookeeper.data.Stat;
 import org.springframework.util.CollectionUtils;
 
@@ -18,41 +20,20 @@ import java.util.Set;
 public final class ReadyRestartInstances implements PathChildrenCacheListener {
 
     private static final String LISTEN_PATH = "/dubbo/restart/instances";
-    private static final Holder<ReadyRestartInstances> EXAMPLE = new Holder<>();
-    private final CuratorFramework zkClient;
+    private final Loader<ZookeeperUtil> zookeeperUtilLoader = SingletonLoader.getLoader(ZookeeperUtil.class);
     private volatile Set<String> nodeNameSet = Collections.emptySet();
 
-    private ReadyRestartInstances(CuratorFramework zkClient) {
-        this.zkClient = zkClient;
+    private ReadyRestartInstances() {
     }
 
-    public static ReadyRestartInstances getInstance() {
-        final ReadyRestartInstances tryGet = EXAMPLE.get();
-        if (tryGet == null) {
-            synchronized (EXAMPLE) {
-                final ReadyRestartInstances doubleTry = EXAMPLE.get();
-                if (doubleTry == null) {
-                    final ReadyRestartInstances instance = createInstance();
-                    EXAMPLE.set(instance);
-                    return instance;
-                } else {
-                    return doubleTry;
-                }
-            }
-        } else {
-            return tryGet;
-        }
+    private static ReadyRestartInstances getInstance() {
+        return new ReadyRestartInstances();
     }
 
-    private static ReadyRestartInstances createInstance() {
-        final CuratorFramework client = ZookeeperUtil.getClient();
-        final ReadyRestartInstances instances = new ReadyRestartInstances(client);
-        instances.createZkListener();
-        return instances;
-    }
-
-    private void createZkListener() {
+    public void createZkListener() {
         try {
+            final ZookeeperUtil zookeeperUtil = zookeeperUtilLoader.getInstance();
+            final CuratorFramework zkClient = zookeeperUtil.getDubboRouterZkClient();
             final Stat stat = zkClient.checkExists().forPath(LISTEN_PATH);
             if (stat == null) {
                 zkClient.create()
@@ -84,12 +65,16 @@ public final class ReadyRestartInstances implements PathChildrenCacheListener {
     }
 
     public void addRestartingInstance(String applicationName, String host) throws Exception {
+        final ZookeeperUtil zookeeperUtil = zookeeperUtilLoader.getInstance();
+        final CuratorFramework zkClient = zookeeperUtil.getDubboRouterZkClient();
         zkClient.create()
                 .creatingParentsIfNeeded()
                 .forPath(LISTEN_PATH + "/" + buildNodeName(applicationName, host));
     }
 
     public void removeRestartingInstance(String applicationName, String host) throws Exception {
+        final ZookeeperUtil zookeeperUtil = zookeeperUtilLoader.getInstance();
+        final CuratorFramework zkClient = zookeeperUtil.getDubboRouterZkClient();
         zkClient.delete()
                 .deletingChildrenIfNeeded()
                 .forPath(LISTEN_PATH + "/" + buildNodeName(applicationName, host));

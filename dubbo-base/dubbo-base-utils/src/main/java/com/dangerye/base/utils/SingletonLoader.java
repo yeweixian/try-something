@@ -5,6 +5,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class SingletonLoader {
     private static final ConcurrentHashMap<Class<?>, Loader<?>> INSTANCE_MAP = new ConcurrentHashMap<>();
 
+    private SingletonLoader() {
+    }
+
     @SuppressWarnings("unchecked")
     public static <C> Loader<C> getLoader(Class<C> clazz) {
         if (clazz == null) {

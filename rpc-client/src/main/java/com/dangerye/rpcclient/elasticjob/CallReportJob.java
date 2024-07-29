@@ -23,7 +23,7 @@ import java.util.List;
 @Component
 public class CallReportJob implements InitializingBean, SimpleJob {
 
-    private final CuratorFramework zkClient = SingletonLoader.getInstance(ZookeeperUtil.class).getMyRPCServicesZkClient();
+    private final ZookeeperUtil zookeeperUtil = SingletonLoader.getInstance(ZookeeperUtil.class);
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -44,6 +44,7 @@ public class CallReportJob implements InitializingBean, SimpleJob {
     public void execute(ShardingContext shardingContext) {
         final long nowTime = System.currentTimeMillis();
         try {
+            final CuratorFramework zkClient = zookeeperUtil.getMyRPCServicesZkClient();
             final List<String> nodeList = zkClient.getChildren().forPath("/");
             if (CollectionUtils.isEmpty(nodeList)) {
                 return;

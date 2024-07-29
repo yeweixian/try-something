@@ -29,7 +29,7 @@ import java.nio.charset.StandardCharsets;
 @EnableConfigurationProperties(RpcConfig.class)
 public class RpcServer implements InitializingBean, DisposableBean, Runnable {
 
-    private final CuratorFramework zkClient = SingletonLoader.getInstance(ZookeeperUtil.class).getMyRPCServicesZkClient();
+    private final ZookeeperUtil zookeeperUtil = SingletonLoader.getInstance(ZookeeperUtil.class);
     @Autowired
     private RpcConfig rpcConfig;
     @Autowired
@@ -76,6 +76,7 @@ public class RpcServer implements InitializingBean, DisposableBean, Runnable {
 
     private void reportServerMsg(String localIp, int port) {
         try {
+            final CuratorFramework zkClient = zookeeperUtil.getMyRPCServicesZkClient();
             zkClient.create()
                     .creatingParentsIfNeeded()
                     .withMode(CreateMode.EPHEMERAL)
