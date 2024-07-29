@@ -8,7 +8,8 @@ import com.dangdang.ddframe.job.lite.api.JobScheduler;
 import com.dangdang.ddframe.job.lite.config.LiteJobConfiguration;
 import com.dangdang.ddframe.job.reg.zookeeper.ZookeeperConfiguration;
 import com.dangdang.ddframe.job.reg.zookeeper.ZookeeperRegistryCenter;
-import com.dangerye.rpcclient.config.BeansConfig;
+import com.dangerye.base.utils.SingletonLoader;
+import com.dangerye.base.utils.ZookeeperUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.curator.framework.CuratorFramework;
@@ -41,14 +42,14 @@ public class CallReportJob implements InitializingBean, SimpleJob {
     public void execute(ShardingContext shardingContext) {
         final long nowTime = System.currentTimeMillis();
         try {
-            final CuratorFramework zookeeperCuratorFramework = BeansConfig.getApplicationContext()
-                    .getBean("zookeeperCuratorFramework", CuratorFramework.class);
-            final List<String> nodeList = zookeeperCuratorFramework.getChildren().forPath("/");
+            final ZookeeperUtil zookeeperUtil = SingletonLoader.getInstance(ZookeeperUtil.class);
+            final CuratorFramework zkClient = zookeeperUtil.getMyRPCServicesZkClient();
+            final List<String> nodeList = zkClient.getChildren().forPath("/");
             if (CollectionUtils.isEmpty(nodeList)) {
                 return;
             }
             for (String node : nodeList) {
-                final byte[] bytes = zookeeperCuratorFramework.getData().forPath("/" + node);
+                final byte[] bytes = zkClient.getData().forPath("/" + node);
                 if (bytes == null) {
                     continue;
                 }
@@ -59,7 +60,7 @@ public class CallReportJob implements InitializingBean, SimpleJob {
                 final String[] split = dataMsg.split("\\|");
                 final long endTime = NumberUtils.toLong(split[0]);
                 if (nowTime > endTime + 5000) {
-                    zookeeperCuratorFramework.setData().forPath("/" + node, "".getBytes(StandardCharsets.UTF_8));
+                    zkClient.setData().forPath("/" + node, "".getBytes(StandardCharsets.UTF_8));
                 }
             }
         } catch (Exception e) {
