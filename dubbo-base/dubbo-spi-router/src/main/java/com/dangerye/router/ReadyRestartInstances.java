@@ -20,6 +20,7 @@ import java.util.Set;
 public final class ReadyRestartInstances implements PathChildrenCacheListener {
 
     private static final String LISTEN_PATH = "/dubbo/restart/instances";
+    private final Loader<Boolean> zkListenerLoader = new Loader<>(null);
     private final Loader<ZookeeperUtil> zookeeperUtilLoader = SingletonLoader.getLoader(ZookeeperUtil.class);
     private volatile Set<String> nodeNameSet = Collections.emptySet();
 
@@ -31,6 +32,18 @@ public final class ReadyRestartInstances implements PathChildrenCacheListener {
     }
 
     public void createZkListener() {
+        final Boolean firstGet = zkListenerLoader.get();
+        if (firstGet == null) {
+            synchronized (zkListenerLoader) {
+                final Boolean doubleGet = zkListenerLoader.get();
+                if (doubleGet == null) {
+                    zkListenerLoader.set(buildZkListener());
+                }
+            }
+        }
+    }
+
+    private boolean buildZkListener() {
         try {
             final ZookeeperUtil zookeeperUtil = zookeeperUtilLoader.getInstance();
             final CuratorFramework zkClient = zookeeperUtil.getDubboRouterZkClient();
@@ -43,9 +56,9 @@ public final class ReadyRestartInstances implements PathChildrenCacheListener {
             final PathChildrenCache pathChildrenCache = new PathChildrenCache(zkClient, LISTEN_PATH, true);
             pathChildrenCache.getListenable().addListener(this);
             pathChildrenCache.start(PathChildrenCache.StartMode.POST_INITIALIZED_EVENT);
+            return true;
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("ReadyRestartInstances createZkListener error.", e);
+            throw new RuntimeException(e);
         }
     }
 
