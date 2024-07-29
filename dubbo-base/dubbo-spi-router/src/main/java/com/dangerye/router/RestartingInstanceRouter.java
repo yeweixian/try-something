@@ -1,5 +1,6 @@
 package com.dangerye.router;
 
+import com.dangerye.base.utils.SingletonLoader;
 import org.apache.dubbo.common.URL;
 import org.apache.dubbo.rpc.Invocation;
 import org.apache.dubbo.rpc.Invoker;
@@ -15,7 +16,9 @@ public class RestartingInstanceRouter implements Router {
     private final URL url;
 
     public RestartingInstanceRouter(URL url) {
-        this.readyRestartInstances = ReadyRestartInstances.getInstance();
+        final ReadyRestartInstances instance = SingletonLoader.getInstance(ReadyRestartInstances.class);
+        instance.createZkListener();
+        this.readyRestartInstances = instance;
         this.url = url;
     }
 
