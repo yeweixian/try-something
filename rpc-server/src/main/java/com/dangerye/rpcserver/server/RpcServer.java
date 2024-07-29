@@ -1,5 +1,7 @@
 package com.dangerye.rpcserver.server;
 
+import com.dangerye.base.utils.SingletonLoader;
+import com.dangerye.base.utils.ZookeeperUtil;
 import com.dangerye.rpcapi.utils.IpUtil;
 import com.dangerye.rpcserver.config.RpcConfig;
 import com.dangerye.rpcserver.handle.RpcServerHandler;
@@ -27,8 +29,7 @@ import java.nio.charset.StandardCharsets;
 @EnableConfigurationProperties(RpcConfig.class)
 public class RpcServer implements InitializingBean, DisposableBean, Runnable {
 
-    @Autowired
-    private CuratorFramework zookeeperCuratorFramework;
+    private final CuratorFramework zkClient = SingletonLoader.getInstance(ZookeeperUtil.class).getMyRPCServicesZkClient();
     @Autowired
     private RpcConfig rpcConfig;
     @Autowired
@@ -75,7 +76,7 @@ public class RpcServer implements InitializingBean, DisposableBean, Runnable {
 
     private void reportServerMsg(String localIp, int port) {
         try {
-            zookeeperCuratorFramework.create()
+            zkClient.create()
                     .creatingParentsIfNeeded()
                     .withMode(CreateMode.EPHEMERAL)
                     .forPath("/" + localIp + ":" + port, "".getBytes(StandardCharsets.UTF_8));

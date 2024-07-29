@@ -1,6 +1,8 @@
 package com.dangerye.rpcclient.utils;
 
 import com.alibaba.fastjson.JSON;
+import com.dangerye.base.utils.SingletonLoader;
+import com.dangerye.base.utils.ZookeeperUtil;
 import com.dangerye.rpcapi.RpcRequest;
 import com.dangerye.rpcapi.RpcResponse;
 import com.dangerye.rpcclient.client.RpcClient;
@@ -12,7 +14,6 @@ import org.apache.curator.framework.recipes.cache.PathChildrenCache;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Proxy;
@@ -25,8 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RpcRemoteClientUtil implements InitializingBean, DisposableBean {
 
     private final ConcurrentHashMap<String, RpcClient> rpcClientMap = new ConcurrentHashMap<>();
-    @Autowired
-    private CuratorFramework zookeeperCuratorFramework;
+    private final CuratorFramework zkClient = SingletonLoader.getInstance(ZookeeperUtil.class).getMyRPCServicesZkClient();
 
     @SuppressWarnings("unchecked")
     public final <T> T createRemoteProxy(Class<T> serviceClass) {
@@ -57,7 +57,7 @@ public class RpcRemoteClientUtil implements InitializingBean, DisposableBean {
             long baseTime = Long.MAX_VALUE;
             RpcClient rpcClient = null;
             for (Map.Entry<String, RpcClient> entry : rpcClientMap.entrySet()) {
-                final byte[] bytes = zookeeperCuratorFramework.getData().forPath("/" + entry.getKey());
+                final byte[] bytes = zkClient.getData().forPath("/" + entry.getKey());
                 if (bytes == null) {
                     return entry.getValue();
                 }
@@ -82,7 +82,7 @@ public class RpcRemoteClientUtil implements InitializingBean, DisposableBean {
     private void reportCallMsg(String service, long beginTime, long endTime) {
         try {
             final long useTime = endTime - beginTime;
-            zookeeperCuratorFramework.setData()
+            zkClient.setData()
                     .forPath("/" + service, (endTime + "|" + useTime).getBytes(StandardCharsets.UTF_8));
         } catch (Exception e) {
             e.printStackTrace();
@@ -91,7 +91,7 @@ public class RpcRemoteClientUtil implements InitializingBean, DisposableBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        final PathChildrenCache pathChildrenCache = new PathChildrenCache(zookeeperCuratorFramework, "/", true);
+        final PathChildrenCache pathChildrenCache = new PathChildrenCache(zkClient, "/", true);
         pathChildrenCache.getListenable()
                 .addListener((cf, ce) -> {
                     final PathChildrenCacheEvent.Type type = ce.getType();
