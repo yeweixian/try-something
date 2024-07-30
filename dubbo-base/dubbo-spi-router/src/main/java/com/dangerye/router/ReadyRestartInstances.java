@@ -1,13 +1,13 @@
 package com.dangerye.router;
 
 import com.dangerye.base.utils.Loader;
-import com.dangerye.base.utils.SingletonLoader;
-import com.dangerye.base.utils.ZookeeperUtil;
+import com.dangerye.base.utils.ZookeeperClientInstance;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
+import org.apache.dubbo.common.extension.ExtensionLoader;
 import org.apache.zookeeper.data.Stat;
 import org.springframework.util.CollectionUtils;
 
@@ -21,7 +21,8 @@ public final class ReadyRestartInstances implements PathChildrenCacheListener {
 
     private static final String LISTEN_PATH = "/dubbo/restart/instances";
     private final Loader<Boolean> zkListenerLoader = new Loader<>(null);
-    private final Loader<ZookeeperUtil> zookeeperUtilLoader = SingletonLoader.getLoader(ZookeeperUtil.class);
+    private final ExtensionLoader<ZookeeperClientInstance> zookeeperClientInstanceExtensionLoader
+            = ExtensionLoader.getExtensionLoader(ZookeeperClientInstance.class);
     private volatile Set<String> nodeNameSet = Collections.emptySet();
 
     private ReadyRestartInstances() {
@@ -45,8 +46,7 @@ public final class ReadyRestartInstances implements PathChildrenCacheListener {
 
     private boolean buildZkListener() {
         try {
-            final ZookeeperUtil zookeeperUtil = zookeeperUtilLoader.getInstance();
-            final CuratorFramework zkClient = zookeeperUtil.getDubboRouterZkClient();
+            final CuratorFramework zkClient = zookeeperClientInstanceExtensionLoader.getExtension("dubboRouter").getClient();
             final Stat stat = zkClient.checkExists().forPath(LISTEN_PATH);
             if (stat == null) {
                 zkClient.create()
@@ -78,16 +78,14 @@ public final class ReadyRestartInstances implements PathChildrenCacheListener {
     }
 
     public void addRestartingInstance(String applicationName, String host) throws Exception {
-        final ZookeeperUtil zookeeperUtil = zookeeperUtilLoader.getInstance();
-        final CuratorFramework zkClient = zookeeperUtil.getDubboRouterZkClient();
+        final CuratorFramework zkClient = zookeeperClientInstanceExtensionLoader.getExtension("dubboRouter").getClient();
         zkClient.create()
                 .creatingParentsIfNeeded()
                 .forPath(LISTEN_PATH + "/" + buildNodeName(applicationName, host));
     }
 
     public void removeRestartingInstance(String applicationName, String host) throws Exception {
-        final ZookeeperUtil zookeeperUtil = zookeeperUtilLoader.getInstance();
-        final CuratorFramework zkClient = zookeeperUtil.getDubboRouterZkClient();
+        final CuratorFramework zkClient = zookeeperClientInstanceExtensionLoader.getExtension("dubboRouter").getClient();
         zkClient.delete()
                 .deletingChildrenIfNeeded()
                 .forPath(LISTEN_PATH + "/" + buildNodeName(applicationName, host));
