@@ -1,1 +1,2 @@
 timeFilter=com.dangerye.filter.TimeFilter
+tpMonitorFilter=com.dangerye.filter.TpMonitorFilter
