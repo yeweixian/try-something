@@ -2,4 +2,4 @@ server:
   port: 8081
 spring:
   application:
-    name: resume-application-01
+    name: resume-application
