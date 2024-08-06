@@ -3,3 +3,10 @@ server:
 spring:
   application:
     name: resume-application
+eureka:
+  client:
+    service-url:
+      defaultZone: http://LagouSCEurekaServer1:8761/eureka,http://LagouSCEurekaServer2:8762/eureka
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}:@project.version@
