@@ -1,13 +1,13 @@
 server:
-  port: 8761
+  port: 8762
 spring:
   application:
     name: scn-eureka-service
 eureka:
   client:
     service-url:
-      defaultZone: http://LagouSCEurekaServer2:8762/eureka
+      defaultZone: http://LagouSCEurekaServer1:8761/eureka
     register-with-eureka: true
     fetch-registry: true
   instance:
-    hostname: LagouSCEurekaServer1
+    hostname: LagouSCEurekaServer2

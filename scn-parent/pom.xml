@@ -12,6 +12,7 @@
         <module>scn-resume</module>
         <module>scn-autodeliver</module>
         <module>scn-eureka-service-8761</module>
+        <module>scn-eureka-service-8762</module>
     </modules>
     <packaging>pom</packaging>
 
