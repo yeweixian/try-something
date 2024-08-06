@@ -32,6 +32,7 @@ public class AutoDeliverController {
         final String host = serviceInstance.getHost();
         final int port = serviceInstance.getPort();
         final String url = "http://" + host + ":" + port + "/resume/status/" + userId;
+        System.out.println("url: " + url);
         return restTemplate.getForObject(url, Integer.class);
     }
 }
