@@ -7,9 +7,12 @@ eureka:
   client:
     service-url:
       defaultZone: http://LagouSCEurekaServer1:8761/eureka,http://LagouSCEurekaServer2:8762/eureka
+    registry-fetch-interval-seconds: 30
   instance:
     prefer-ip-address: true
     instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}:@project.version@
     metadata-map:
       key1: value1
       key2: value2
+    lease-renewal-interval-in-seconds: 30
+    lease-expiration-duration-in-seconds: 90
