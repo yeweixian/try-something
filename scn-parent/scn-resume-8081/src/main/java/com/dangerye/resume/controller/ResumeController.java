@@ -11,6 +11,8 @@ public class ResumeController {
 
     @RequestMapping("/status/{userId}")
     public Integer getStatusByUserId(@PathVariable Long userId) {
-        return RandomUtils.nextInt(0, 10);
+        final int i = RandomUtils.nextInt(0, 10);
+        System.out.println("8081: " + i);
+        return i;
     }
 }
