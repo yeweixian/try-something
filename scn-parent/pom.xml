@@ -14,6 +14,7 @@
         <module>scn-eureka-service-8761</module>
         <module>scn-eureka-service-8762</module>
         <module>scn-resume-8082</module>
+        <module>scn-hystrix-dashboard-9001</module>
     </modules>
     <packaging>pom</packaging>
 
