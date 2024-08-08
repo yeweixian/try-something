@@ -59,7 +59,12 @@ public class AutoDeliverController {
             @HystrixProperty(name = "coreSize", value = "2"),
             @HystrixProperty(name = "maxQueueSize", value = "20")
     }, commandProperties = {
-            @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000")
+            @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000"),
+            // 高级配置
+            @HystrixProperty(name = "metrics.rollingStats.timeInMilliseconds", value = "8000"),
+            @HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "2"),
+            @HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
+            @HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "3000")
     }, fallbackMethod = "fallbackCheckStatusByUserId")
     public Integer checkStatusFallbackByUserId(@PathVariable Long userId) {
         final String url = "http://resume-application/resume/status/" + userId;
