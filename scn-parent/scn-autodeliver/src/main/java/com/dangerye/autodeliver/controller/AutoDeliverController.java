@@ -1,5 +1,7 @@
 package com.dangerye.autodeliver.controller;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,5 +40,27 @@ public class AutoDeliverController {
     public Integer checkStatusByUserId(@PathVariable Long userId) {
         final String url = "http://resume-application/resume/status/" + userId;
         return restTemplate.getForObject(url, Integer.class);
+    }
+
+    @RequestMapping("/checkStatusTimeOut/{userId}")
+    @HystrixCommand(commandProperties = {
+            @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000")
+    })
+    public Integer checkStatusTimeOutByUserId(@PathVariable Long userId) {
+        final String url = "http://resume-application/resume/status/" + userId;
+        return restTemplate.getForObject(url, Integer.class);
+    }
+
+    @RequestMapping("/checkStatusFallback/{userId}")
+    @HystrixCommand(commandProperties = {
+            @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000")
+    }, fallbackMethod = "fallbackCheckStatusByUserId")
+    public Integer checkStatusFallbackByUserId(@PathVariable Long userId) {
+        final String url = "http://resume-application/resume/status/" + userId;
+        return restTemplate.getForObject(url, Integer.class);
+    }
+
+    public Integer fallbackCheckStatusByUserId(@PathVariable Long userId) {
+        return -1;
     }
 }

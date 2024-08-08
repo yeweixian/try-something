@@ -5,12 +5,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.concurrent.TimeUnit;
+
 @RestController
 @RequestMapping("/resume")
 public class ResumeController {
 
     @RequestMapping("/status/{userId}")
-    public Integer getStatusByUserId(@PathVariable Long userId) {
+    public Integer getStatusByUserId(@PathVariable Long userId) throws InterruptedException {
+        TimeUnit.SECONDS.sleep(10);
         final int i = RandomUtils.nextInt(0, 10);
         System.out.println("8082: " + i);
         return i;
