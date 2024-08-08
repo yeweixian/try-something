@@ -43,7 +43,10 @@ public class AutoDeliverController {
     }
 
     @RequestMapping("/checkStatusTimeOut/{userId}")
-    @HystrixCommand(commandProperties = {
+    @HystrixCommand(threadPoolKey = "checkStatusTimeOutByUserId", threadPoolProperties = {
+            @HystrixProperty(name = "coreSize", value = "2"),
+            @HystrixProperty(name = "maxQueueSize", value = "20")
+    }, commandProperties = {
             @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000")
     })
     public Integer checkStatusTimeOutByUserId(@PathVariable Long userId) {
@@ -52,7 +55,10 @@ public class AutoDeliverController {
     }
 
     @RequestMapping("/checkStatusFallback/{userId}")
-    @HystrixCommand(commandProperties = {
+    @HystrixCommand(threadPoolKey = "checkStatusFallbackByUserId", threadPoolProperties = {
+            @HystrixProperty(name = "coreSize", value = "2"),
+            @HystrixProperty(name = "maxQueueSize", value = "20")
+    }, commandProperties = {
             @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "2000")
     }, fallbackMethod = "fallbackCheckStatusByUserId")
     public Integer checkStatusFallbackByUserId(@PathVariable Long userId) {
