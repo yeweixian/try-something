@@ -9,12 +9,13 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>scn-common</module>
-        <module>scn-resume-8081</module>
-        <module>scn-autodeliver</module>
         <module>scn-eureka-service-8761</module>
         <module>scn-eureka-service-8762</module>
+        <module>scn-autodeliver</module>
+        <module>scn-resume-8081</module>
         <module>scn-resume-8082</module>
         <module>scn-hystrix-dashboard-9001</module>
+        <module>scn-hystrix-turbine-9101</module>
     </modules>
     <packaging>pom</packaging>
 
