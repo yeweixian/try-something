@@ -31,3 +31,6 @@ resume-application:
     MaxAutoRetries: 0 #对当前选中实例重试次数，
     MaxAutoRetriesNextServer: 0 #切换实例的重试次数
     NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RoundRobinRule #负载策略调整
+logging:
+  level:
+    com.dangerye.autodeliver.services.ResumeServiceFeignClient: debug
