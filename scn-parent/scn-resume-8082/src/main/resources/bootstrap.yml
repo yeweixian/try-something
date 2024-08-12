@@ -1,0 +1,16 @@
+server:
+  port: 8082
+spring:
+  application:
+    name: resume-application
+  cloud:
+    config:
+      uri: http://localhost:9201/
+      label: main
+      profile: dev
+      name: resume-application
+eureka:
+  client:
+    service-url:
+      defaultZone: http://LagouSCEurekaServer1:8761/eureka,http://LagouSCEurekaServer2:8762/eureka
+    registry-fetch-interval-seconds: 30
