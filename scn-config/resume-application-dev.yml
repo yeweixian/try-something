@@ -7,3 +7,7 @@ eureka:
       key2: value2
     lease-renewal-interval-in-seconds: 30
     lease-expiration-duration-in-seconds: 90
+
+server:
+  config:
+    test: hello, world!
