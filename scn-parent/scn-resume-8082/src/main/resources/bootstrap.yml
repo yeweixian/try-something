@@ -14,3 +14,12 @@ eureka:
     service-url:
       defaultZone: http://LagouSCEurekaServer1:8761/eureka,http://LagouSCEurekaServer2:8762/eureka
     registry-fetch-interval-seconds: 30
+# 开启健康检查接口 /actuator/health
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
