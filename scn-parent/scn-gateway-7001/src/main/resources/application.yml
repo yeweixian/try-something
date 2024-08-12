@@ -7,11 +7,13 @@ spring:
     gateway:
       routes:
         - id: autoDeliver-application-router
-          uri: http://127.0.0.1:8091
+          # uri: http://127.0.0.1:8091
+          uri: lb://autoDeliver-application
           predicates:
             - Path=/autoDeliver/**
         - id: resume-application-router
-          uri: http://127.0.0.1:8081
+          # uri: http://127.0.0.1:8081
+          uri: lb://resume-application
           predicates:
             - Path=/resume/**
 eureka:
