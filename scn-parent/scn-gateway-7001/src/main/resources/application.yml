@@ -16,6 +16,12 @@ spring:
           uri: lb://resume-application
           predicates:
             - Path=/resume/**
+        - id: resume-application-router-with-filter
+          uri: lb://resume-application
+          predicates:
+            - Path=/home/resume/**
+          filters:
+            - StripPrefix=1
 eureka:
   client:
     service-url:
