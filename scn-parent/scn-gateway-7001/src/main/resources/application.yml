@@ -1,0 +1,32 @@
+server:
+  port: 7001
+spring:
+  application:
+    name: scn-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: autoDeliver-application-router
+          uri: http://127.0.0.1:8091
+          predicates:
+            - Path=/autoDeliver/**
+        - id: resume-application-router
+          uri: http://127.0.0.1:8081
+          predicates:
+            - Path=/resume/**
+eureka:
+  client:
+    service-url:
+      defaultZone: http://LagouSCEurekaServer1:8761/eureka,http://LagouSCEurekaServer2:8762/eureka
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}:@project.version@
+# 开启健康检查接口 /actuator/health
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
