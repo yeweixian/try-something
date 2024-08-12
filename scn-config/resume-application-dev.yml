@@ -10,4 +10,4 @@ eureka:
 
 server:
   config:
-    test: hello, world!
+    test: hello, world! - 9394
