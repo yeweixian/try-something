@@ -1,0 +1,30 @@
+server:
+  port: 9201
+spring:
+  application:
+    name: scn-configserver
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/yeweixian/try-something.git
+          username: ${GITHUB_USERNAME}
+          password: ${GITHUB_PASSWORD}
+          search-paths: scn-config
+      label: main
+eureka:
+  client:
+    service-url:
+      defaultZone: http://LagouSCEurekaServer1:8761/eureka,http://LagouSCEurekaServer2:8762/eureka
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}:@project.version@
+# 开启健康检查接口 /actuator/health
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always

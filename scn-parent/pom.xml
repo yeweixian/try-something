@@ -17,6 +17,7 @@
         <module>scn-resume-8082</module>
         <module>scn-hystrix-dashboard-9001</module>
         <module>scn-hystrix-turbine-9101</module>
+        <module>scn-configserver-9201</module>
     </modules>
     <packaging>pom</packaging>
 
