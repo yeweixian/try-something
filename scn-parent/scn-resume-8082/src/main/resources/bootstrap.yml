@@ -1,5 +1,6 @@
 server:
   port: 8082
+  version: @project.version@
 spring:
   application:
     name: resume-application

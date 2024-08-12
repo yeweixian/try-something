@@ -1,7 +1,7 @@
 eureka:
   instance:
     prefer-ip-address: true
-    instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}:@project.version@
+    instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}:${server.version}
     metadata-map:
       key1: value1
       key2: value2
