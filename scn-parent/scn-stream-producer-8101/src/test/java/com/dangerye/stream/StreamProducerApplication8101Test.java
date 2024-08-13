@@ -15,7 +15,7 @@ public class StreamProducerApplication8101Test {
 
     @Test
     public void testSendMessage() {
-        messageProducer.sendMessage("hello, world.");
+        messageProducer.sendMessage("hello, world. - 9394");
         System.out.println("send message...");
     }
 }
