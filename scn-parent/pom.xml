@@ -18,6 +18,9 @@
         <module>scn-hystrix-dashboard-9001</module>
         <module>scn-hystrix-turbine-9101</module>
         <module>scn-configserver-9201</module>
+        <module>scn-stream-producer-8101</module>
+        <module>scn-stream-consumer-8111</module>
+        <module>scn-stream-consumer-8112</module>
     </modules>
     <packaging>pom</packaging>
 

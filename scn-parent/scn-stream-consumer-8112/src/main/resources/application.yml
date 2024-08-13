@@ -1,0 +1,38 @@
+server:
+  port: 8112
+spring:
+  application:
+    name: scn-stream-consumer
+  cloud:
+    stream:
+      bindings:
+        input:
+          destination: myExchange
+          content-type: text/plain #application/json
+          binder: myRabbitBinder
+      binders:
+        myRabbitBinder:
+          type: rabbit
+          environment:
+            spring:
+              rabbitmq:
+                host: localhost
+                port: 5672
+                username: guest
+                password: guest
+eureka:
+  client:
+    service-url:
+      defaultZone: http://LagouSCEurekaServer1:8761/eureka,http://LagouSCEurekaServer2:8762/eureka
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}:@project.version@
+# 开启健康检查接口 /actuator/health
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
