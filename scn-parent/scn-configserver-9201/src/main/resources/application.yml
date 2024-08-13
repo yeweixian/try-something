@@ -25,6 +25,7 @@ eureka:
     prefer-ip-address: true
     instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port}:@project.version@
 # 开启健康检查接口 /actuator/health
+# http://localhost:9201/actuator/bus-refresh/resume-application:8081 （为定向更新）
 management:
   endpoints:
     web:
