@@ -10,6 +10,7 @@ spring:
           destination: myExchange
           content-type: text/plain #application/json
           binder: myRabbitBinder
+          group: myRabbitGroup
       binders:
         myRabbitBinder:
           type: rabbit
