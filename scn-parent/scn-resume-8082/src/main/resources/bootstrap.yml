@@ -9,6 +9,11 @@ spring:
       label: main
       profile: dev
       name: resume-application
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
 eureka:
   client:
     service-url:

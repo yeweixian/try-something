@@ -12,6 +12,11 @@ spring:
           password: ${GITHUB_PASSWORD}
           search-paths: scn-config
       label: main
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
 eureka:
   client:
     service-url:
