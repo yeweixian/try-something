@@ -24,8 +24,8 @@ public class ResumeController {
 
     @RequestMapping("/status/{userId}")
     public Integer getStatusByUserId(@PathVariable Long userId) throws InterruptedException {
-        TimeUnit.SECONDS.sleep(10);
         final int i = RandomUtils.nextInt(0, 10);
+        TimeUnit.SECONDS.sleep(i);
         System.out.println("8082: " + i);
         return i;
     }
