@@ -2,6 +2,7 @@ package com.dangerye.autodeliver.controller;
 
 import com.dangerye.autodeliver.services.ResumeServiceFeignClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/autoDeliver")
 public class AutoDeliverController {
 
+    @Qualifier("com.dangerye.autodeliver.services.ResumeServiceFeignClient")
     @Autowired
     private ResumeServiceFeignClient resumeServiceFeignClient;
 
