@@ -16,10 +16,16 @@ spring:
           uri: lb://resume-application
           predicates:
             - Path=/resume/**
+        - id: autoDeliver-application-router-with-filter
+          uri: lb://autoDeliver-application
+          predicates:
+            - Path=/api/autoDeliver/**
+          filters:
+            - StripPrefix=1
         - id: resume-application-router-with-filter
           uri: lb://resume-application
           predicates:
-            - Path=/home/resume/**
+            - Path=/api/resume/**
           filters:
             - StripPrefix=1
 eureka:
