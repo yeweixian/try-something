@@ -21,6 +21,7 @@
         <module>scn-stream-producer-8101</module>
         <module>scn-stream-consumer-8111</module>
         <module>scn-stream-consumer-8112</module>
+        <module>scn-log-zipkin-9411</module>
     </modules>
     <packaging>pom</packaging>
 
