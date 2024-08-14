@@ -31,9 +31,6 @@ resume-application:
     MaxAutoRetries: 0 #对当前选中实例重试次数，
     MaxAutoRetriesNextServer: 0 #切换实例的重试次数
     NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RoundRobinRule #负载策略调整
-logging:
-  level:
-    com.dangerye.autodeliver.services.ResumeServiceFeignClient: debug
 feign:
   hystrix:
     enabled: true
@@ -51,3 +48,10 @@ hystrix:
         isolation:
           thread:
             timeoutInMilliseconds: 15000  # Hystrix的超时时⻓设置 跟 ribbon ReadTimeout 进行对比取最小值 达到进入熔断逻辑;
+
+#分布式链路追踪
+logging:
+  level:
+    com.dangerye.autodeliver.services.ResumeServiceFeignClient: debug
+    org.springframework.web.servlet.DispatcherServlet: debug
+    org.springframework.cloud.sleuth: debug
