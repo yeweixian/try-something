@@ -2,31 +2,20 @@ package com.dangerye.base.utils;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-public final class SingletonLoader {
-    private static final ConcurrentHashMap<Class<?>, Loader<?>> INSTANCE_MAP = new ConcurrentHashMap<>();
+public final class SingletonLoader<C> {
+    private static final ConcurrentHashMap<Class<?>, SingletonLoader<?>> SINGLETON_LOADER_MAP = new ConcurrentHashMap<>();
+    private final Class<C> clazz;
 
-    private SingletonLoader() {
+    private SingletonLoader(Class<C> clazz) {
+        this.clazz = clazz;
     }
 
     @SuppressWarnings("unchecked")
-    public static <C> Loader<C> getLoader(Class<C> clazz) {
+    public static <C> SingletonLoader<C> getSingletonLoader(Class<C> clazz) {
         if (clazz == null) {
-            throw new NullPointerException();
-        }
-        final Loader<?> tryFirst = INSTANCE_MAP.get(clazz);
-        if (tryFirst == null) {
-            synchronized (INSTANCE_MAP) {
-                final Loader<?> loader = INSTANCE_MAP.get(clazz);
-                if (loader == null) {
-                    final Loader<C> cLoader = new Loader<>(clazz);
-                    INSTANCE_MAP.putIfAbsent(clazz, cLoader);
-                    return cLoader;
-                } else {
-                    return (Loader<C>) loader;
-                }
-            }
+            return new SingletonLoader<>(null);
         } else {
-            return (Loader<C>) tryFirst;
+            return (SingletonLoader<C>) SINGLETON_LOADER_MAP.computeIfAbsent(clazz, SingletonLoader::new);
         }
     }
 }
