@@ -29,9 +29,4 @@ public final class SingletonLoader {
             return (Loader<C>) tryFirst;
         }
     }
-
-    public static <C> C getInstance(Class<C> clazz) {
-        final Loader<C> loader = getLoader(clazz);
-        return loader.getInstance();
-    }
 }
