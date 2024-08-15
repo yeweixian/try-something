@@ -13,7 +13,7 @@ public final class SingletonLoader<C> {
     @SuppressWarnings("unchecked")
     public static <C> SingletonLoader<C> getSingletonLoader(Class<C> clazz) {
         if (clazz == null) {
-            return new SingletonLoader<>(null);
+            throw new NullPointerException();
         } else {
             return (SingletonLoader<C>) SINGLETON_LOADER_MAP.computeIfAbsent(clazz, SingletonLoader::new);
         }
