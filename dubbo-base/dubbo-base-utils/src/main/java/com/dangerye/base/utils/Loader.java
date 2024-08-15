@@ -1,6 +1,7 @@
 package com.dangerye.base.utils;
 
 import java.lang.reflect.Method;
+import java.util.function.Supplier;
 
 public final class Loader<C> {
     private final Class<C> clazz;
@@ -10,19 +11,11 @@ public final class Loader<C> {
         this.clazz = clazz;
     }
 
-    public void set(C instance) {
-        this.instance = instance;
-    }
-
-    public C get() {
-        return instance;
-    }
-
-    public C getInstance() {
+    public C getInstance(Supplier<C> supplier) {
         if (instance == null) {
             synchronized (this) {
                 if (instance == null) {
-                    return instance = createInstance();
+                    return instance = supplier.get();
                 } else {
                     return instance;
                 }
@@ -30,6 +23,10 @@ public final class Loader<C> {
         } else {
             return instance;
         }
+    }
+
+    public C getInstance() {
+        return getInstance(this::createInstance);
     }
 
     @SuppressWarnings("unchecked")
