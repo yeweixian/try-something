@@ -16,21 +16,7 @@ public final class ZookeeperUtil {
     }
 
     public CuratorFramework getMyRPCServicesZkClient() {
-        final CuratorFramework firstGet = myRPCServicesZkClientLoader.get();
-        if (firstGet == null) {
-            synchronized (myRPCServicesZkClientLoader) {
-                final CuratorFramework zkClient = myRPCServicesZkClientLoader.get();
-                if (zkClient == null) {
-                    final CuratorFramework client = createMyRPCServicesZkClient();
-                    myRPCServicesZkClientLoader.set(client);
-                    return client;
-                } else {
-                    return zkClient;
-                }
-            }
-        } else {
-            return firstGet;
-        }
+        return myRPCServicesZkClientLoader.getInstance(this::createMyRPCServicesZkClient);
     }
 
     private CuratorFramework createMyRPCServicesZkClient() {
@@ -47,21 +33,7 @@ public final class ZookeeperUtil {
     }
 
     public CuratorFramework getDubboRouterZkClient() {
-        final CuratorFramework firstGet = dubboRouterZkClientLoader.get();
-        if (firstGet == null) {
-            synchronized (dubboRouterZkClientLoader) {
-                final CuratorFramework zkClient = dubboRouterZkClientLoader.get();
-                if (zkClient == null) {
-                    final CuratorFramework client = createDubboRouterZkClient();
-                    dubboRouterZkClientLoader.set(client);
-                    return client;
-                } else {
-                    return zkClient;
-                }
-            }
-        } else {
-            return firstGet;
-        }
+        return dubboRouterZkClientLoader.getInstance(this::createDubboRouterZkClient);
     }
 
     private CuratorFramework createDubboRouterZkClient() {
