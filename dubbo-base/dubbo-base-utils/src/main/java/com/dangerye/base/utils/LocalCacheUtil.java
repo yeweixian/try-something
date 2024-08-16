@@ -6,7 +6,6 @@ import java.util.PriorityQueue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -17,8 +16,8 @@ public final class LocalCacheUtil<T> implements Runnable {
     private LocalCacheUtil(int initialCapacity) {
         cache = new ConcurrentHashMap<>(initialCapacity);
         queue = new PriorityQueue<>(initialCapacity);
-        final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-        executor.scheduleWithFixedDelay(this, 5, 5, TimeUnit.SECONDS);
+        Executors.newSingleThreadScheduledExecutor()
+                .scheduleWithFixedDelay(this, 5, 5, TimeUnit.SECONDS);
     }
 
     public static <T> LocalCacheUtil<T> buildCache(int initialCapacity) {

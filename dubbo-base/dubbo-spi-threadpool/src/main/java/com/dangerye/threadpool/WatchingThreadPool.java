@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 public class WatchingThreadPool extends FixedThreadPool implements Runnable {
 
     private static final double ALARM_PERCENT = 0.90;
-    private final Map<URL, ThreadPoolExecutor> THREAD_POOLS = new ConcurrentHashMap<>();
+    private final Map<URL, ThreadPoolExecutor> threadPoolMap = new ConcurrentHashMap<>();
 
     public WatchingThreadPool() {
         Executors.newSingleThreadScheduledExecutor()
@@ -26,14 +26,14 @@ public class WatchingThreadPool extends FixedThreadPool implements Runnable {
     public Executor getExecutor(URL url) {
         final Executor executor = super.getExecutor(url);
         if (executor instanceof ThreadPoolExecutor) {
-            THREAD_POOLS.put(url, (ThreadPoolExecutor) executor);
+            threadPoolMap.putIfAbsent(url, (ThreadPoolExecutor) executor);
         }
         return executor;
     }
 
     @Override
     public void run() {
-        for (Map.Entry<URL, ThreadPoolExecutor> entry : THREAD_POOLS.entrySet()) {
+        for (Map.Entry<URL, ThreadPoolExecutor> entry : threadPoolMap.entrySet()) {
             final URL key = entry.getKey();
             final ThreadPoolExecutor value = entry.getValue();
             final int activeCount = value.getActiveCount();

@@ -1,6 +1,5 @@
 package com.dangerye.filter;
 
-import com.dangerye.base.utils.Loader;
 import com.dangerye.base.utils.LocalCacheUtil;
 import org.apache.dubbo.common.constants.CommonConstants;
 import org.apache.dubbo.common.extension.Activate;
@@ -14,31 +13,17 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Activate(group = {CommonConstants.CONSUMER})
-public class TpMonitorFilter implements Filter, Runnable {
-    private static final LocalCacheUtil<Transfer> TP_MONITOR_CACHE = LocalCacheUtil.buildCache(20000);
-    private static final ScheduledExecutorService SCHEDULED_EXECUTOR = Executors.newSingleThreadScheduledExecutor();
-    private static final Loader<Boolean> SCHEDULED_LOADER = new Loader<>(null);
+public final class TpMonitorFilter implements Filter, Runnable {
+    private final LocalCacheUtil<Transfer> tpMonitorCache;
 
     public TpMonitorFilter() {
-        final Boolean first = SCHEDULED_LOADER.get();
-        if (first == null) {
-            synchronized (SCHEDULED_LOADER) {
-                final Boolean doubleCheck = SCHEDULED_LOADER.get();
-                if (doubleCheck == null) {
-                    SCHEDULED_LOADER.set(buildScheduled());
-                }
-            }
-        }
-    }
-
-    private Boolean buildScheduled() {
-        SCHEDULED_EXECUTOR.scheduleWithFixedDelay(this, 5, 5, TimeUnit.SECONDS);
-        return true;
+        tpMonitorCache = LocalCacheUtil.buildCache(20000);
+        Executors.newSingleThreadScheduledExecutor()
+                .scheduleWithFixedDelay(this, 5, 5, TimeUnit.SECONDS);
     }
 
     @Override
@@ -51,14 +36,14 @@ public class TpMonitorFilter implements Filter, Runnable {
         } finally {
             final long transferTime = System.currentTimeMillis() - beginTime;
             final Transfer transfer = new Transfer(serviceName + "#" + methodName, transferTime);
-            TP_MONITOR_CACHE.cache(transfer, 60000);
+            tpMonitorCache.cache(transfer, 60000);
         }
     }
 
     @Override
     public void run() {
         System.out.println("------------ line ------------");
-        final List<Transfer> transferList = TP_MONITOR_CACHE.findAll();
+        final List<Transfer> transferList = tpMonitorCache.findAll();
         if (transferList.isEmpty()) {
             System.out.println("consumer tp monitor data is empty...");
             return;
