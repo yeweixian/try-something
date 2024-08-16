@@ -1,6 +1,7 @@
 package com.dangerye.router;
 
 import com.dangerye.base.utils.SingletonLoader;
+import com.dangerye.router.utils.RestartServiceRiskControlUtil;
 import org.apache.dubbo.common.URL;
 import org.apache.dubbo.rpc.Invocation;
 import org.apache.dubbo.rpc.Invoker;
@@ -12,13 +13,14 @@ import java.util.stream.Collectors;
 
 public class RestartingInstanceRouter implements Router {
 
-    private final ReadyRestartInstances readyRestartInstances;
+    private final RestartServiceRiskControlUtil riskControlUtil;
     private final URL url;
 
     public RestartingInstanceRouter(URL url) {
-        final ReadyRestartInstances instance = SingletonLoader.getInstance(ReadyRestartInstances.class);
-        instance.createZkListener();
-        this.readyRestartInstances = instance;
+        final SingletonLoader<RestartServiceRiskControlUtil> singletonLoader = SingletonLoader.getSingletonLoader(RestartServiceRiskControlUtil.class);
+        final RestartServiceRiskControlUtil riskControlUtil = singletonLoader.getSingletonInstance("restartServiceRiskControlUtil");
+        riskControlUtil.createZkListener();
+        this.riskControlUtil = riskControlUtil;
         this.url = url;
     }
 
@@ -34,7 +36,7 @@ public class RestartingInstanceRouter implements Router {
                     final String applicationName = invoker.getUrl().getParameter("remote.application");
                     final String host = invoker.getUrl().getIp();
                     System.out.println("applicationName: " + applicationName + " host: " + host);
-                    return !readyRestartInstances.isRestartingInstance(applicationName, host);
+                    return !riskControlUtil.isRestartingInstance(applicationName, host);
                 }).collect(Collectors.toList());
     }
 
