@@ -1,32 +1,21 @@
 package com.dangerye.base.utils;
 
 import org.apache.dubbo.common.extension.ExtensionLoader;
-import org.apache.dubbo.common.utils.CollectionUtils;
 import org.apache.dubbo.common.utils.StringUtils;
 
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+@SuppressWarnings("rawtypes")
 public final class SingletonLoader<I> {
     private static final ConcurrentHashMap<Class<?>, SingletonLoader<?>> SINGLETON_LOADER_MAP = new ConcurrentHashMap<>();
-    private static final ConcurrentHashMap<String, SingletonInstance<?>> SINGLETON_INSTANCE_MAP = new ConcurrentHashMap<>();
-
-    static {
-        @SuppressWarnings("rawtypes") final ExtensionLoader<SingletonInstance> extensionLoader = ExtensionLoader.getExtensionLoader(SingletonInstance.class);
-        final Set<String> supportedExtensions = extensionLoader.getSupportedExtensions();
-        if (CollectionUtils.isNotEmpty(supportedExtensions)) {
-            for (String name : supportedExtensions) {
-                SINGLETON_INSTANCE_MAP.computeIfAbsent(name, extensionLoader::getExtension);
-            }
-        }
-    }
-
-    private final Class<I> clazz;
+    private final ExtensionLoader<SingletonInstance> extensionLoader;
     private final ConcurrentHashMap<String, Loader<I>> instanceLoaderMap;
+    private final Class<I> clazz;
 
     private SingletonLoader(Class<I> clazz) {
-        this.clazz = clazz;
+        this.extensionLoader = ExtensionLoader.getExtensionLoader(SingletonInstance.class);
         this.instanceLoaderMap = new ConcurrentHashMap<>();
+        this.clazz = clazz;
     }
 
     @SuppressWarnings("unchecked")
@@ -42,7 +31,7 @@ public final class SingletonLoader<I> {
         if (StringUtils.isEmpty(name)) {
             throw new NullPointerException();
         }
-        final SingletonInstance<?> singletonInstance = SINGLETON_INSTANCE_MAP.get(name);
+        final SingletonInstance singletonInstance = extensionLoader.getExtension(name);
         if (singletonInstance == null) {
             throw new IllegalStateException("No such SingletonInstance by name: " + name);
         }
