@@ -9,7 +9,6 @@ import com.dangdang.ddframe.job.lite.config.LiteJobConfiguration;
 import com.dangdang.ddframe.job.reg.zookeeper.ZookeeperConfiguration;
 import com.dangdang.ddframe.job.reg.zookeeper.ZookeeperRegistryCenter;
 import com.dangerye.base.utils.SingletonLoader;
-import com.dangerye.base.utils.ZookeeperUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.curator.framework.CuratorFramework;
@@ -23,7 +22,7 @@ import java.util.List;
 @Component
 public class CallReportJob implements InitializingBean, SimpleJob {
 
-    private final ZookeeperUtil zookeeperUtil = SingletonLoader.getInstance(ZookeeperUtil.class);
+    private final SingletonLoader<CuratorFramework> singletonLoader = SingletonLoader.getSingletonLoader(CuratorFramework.class);
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -44,7 +43,7 @@ public class CallReportJob implements InitializingBean, SimpleJob {
     public void execute(ShardingContext shardingContext) {
         final long nowTime = System.currentTimeMillis();
         try {
-            final CuratorFramework zkClient = zookeeperUtil.getMyRPCServicesZkClient();
+            final CuratorFramework zkClient = singletonLoader.getSingletonInstance("myRPCServicesZkClient");
             final List<String> nodeList = zkClient.getChildren().forPath("/");
             if (CollectionUtils.isEmpty(nodeList)) {
                 return;
