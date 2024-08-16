@@ -12,7 +12,7 @@ public final class SingletonLoader<I> {
     private static final ConcurrentHashMap<String, SingletonInstance<?>> SINGLETON_INSTANCE_MAP = new ConcurrentHashMap<>();
 
     static {
-        final ExtensionLoader<SingletonInstance> extensionLoader = ExtensionLoader.getExtensionLoader(SingletonInstance.class);
+        @SuppressWarnings("rawtypes") final ExtensionLoader<SingletonInstance> extensionLoader = ExtensionLoader.getExtensionLoader(SingletonInstance.class);
         final Set<String> supportedExtensions = extensionLoader.getSupportedExtensions();
         if (CollectionUtils.isNotEmpty(supportedExtensions)) {
             for (String name : supportedExtensions) {
