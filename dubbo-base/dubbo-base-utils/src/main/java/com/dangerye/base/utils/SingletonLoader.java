@@ -30,15 +30,14 @@ public final class SingletonLoader<I> {
     }
 
     @SuppressWarnings("unchecked")
-    public static <C> SingletonLoader<C> getSingletonLoader(Class<C> clazz) {
+    public static <I> SingletonLoader<I> getSingletonLoader(Class<I> clazz) {
         if (clazz == null) {
             throw new NullPointerException();
         } else {
-            return (SingletonLoader<C>) SINGLETON_LOADER_MAP.computeIfAbsent(clazz, SingletonLoader::new);
+            return (SingletonLoader<I>) SINGLETON_LOADER_MAP.computeIfAbsent(clazz, SingletonLoader::new);
         }
     }
 
-    @SuppressWarnings("unchecked")
     public I getSingletonInstance(String name) {
         if (StringUtils.isEmpty(name)) {
             throw new NullPointerException();
@@ -48,6 +47,6 @@ public final class SingletonLoader<I> {
             throw new IllegalStateException("No such SingletonInstance by name: " + name);
         }
         final Loader<I> instanceLoader = instanceLoaderMap.computeIfAbsent(name, mapKey -> new Loader<>());
-        return instanceLoader.getInstance(() -> (I) singletonInstance.getInstance());
+        return instanceLoader.getInstance(() -> clazz.cast(singletonInstance.getInstance()));
     }
 }

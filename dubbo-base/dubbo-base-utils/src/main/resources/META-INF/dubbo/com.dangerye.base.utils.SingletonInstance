@@ -1,0 +1,2 @@
+dubboRouterZkClient=com.dangerye.base.utils.impl.DubboRouterZkClient
+myRPCServicesZkClient=com.dangerye.base.utils.impl.MyRPCServicesZkClient
