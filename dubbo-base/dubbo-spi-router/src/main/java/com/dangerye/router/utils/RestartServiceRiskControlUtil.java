@@ -1,13 +1,12 @@
-package com.dangerye.router;
+package com.dangerye.router.utils;
 
 import com.dangerye.base.utils.Loader;
-import com.dangerye.base.utils.ZookeeperClientInstance;
+import com.dangerye.base.utils.SingletonLoader;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
-import org.apache.dubbo.common.extension.ExtensionLoader;
 import org.apache.zookeeper.data.Stat;
 import org.springframework.util.CollectionUtils;
 
@@ -17,36 +16,20 @@ import java.util.List;
 import java.util.Set;
 
 @Slf4j
-public final class ReadyRestartInstances implements PathChildrenCacheListener {
+public final class RestartServiceRiskControlUtil implements PathChildrenCacheListener {
 
     private static final String LISTEN_PATH = "/dubbo/restart/instances";
-    private final Loader<Boolean> zkListenerLoader = new Loader<>(null);
-    private final ExtensionLoader<ZookeeperClientInstance> zookeeperClientInstanceExtensionLoader
-            = ExtensionLoader.getExtensionLoader(ZookeeperClientInstance.class);
+    private final Loader<Boolean> zkListenerLoader = new Loader<>();
+    private final SingletonLoader<CuratorFramework> singletonLoader = SingletonLoader.getSingletonLoader(CuratorFramework.class);
     private volatile Set<String> nodeNameSet = Collections.emptySet();
 
-    private ReadyRestartInstances() {
-    }
-
-    private static ReadyRestartInstances getInstance() {
-        return new ReadyRestartInstances();
-    }
-
     public void createZkListener() {
-        final Boolean firstGet = zkListenerLoader.get();
-        if (firstGet == null) {
-            synchronized (zkListenerLoader) {
-                final Boolean doubleGet = zkListenerLoader.get();
-                if (doubleGet == null) {
-                    zkListenerLoader.set(buildZkListener());
-                }
-            }
-        }
+        zkListenerLoader.getInstance(this::buildZkListener);
     }
 
     private boolean buildZkListener() {
         try {
-            final CuratorFramework zkClient = zookeeperClientInstanceExtensionLoader.getExtension("dubboRouter").getClient();
+            final CuratorFramework zkClient = singletonLoader.getSingletonInstance("dubboRouterZkClient");
             final Stat stat = zkClient.checkExists().forPath(LISTEN_PATH);
             if (stat == null) {
                 zkClient.create()
@@ -78,14 +61,14 @@ public final class ReadyRestartInstances implements PathChildrenCacheListener {
     }
 
     public void addRestartingInstance(String applicationName, String host) throws Exception {
-        final CuratorFramework zkClient = zookeeperClientInstanceExtensionLoader.getExtension("dubboRouter").getClient();
+        final CuratorFramework zkClient = singletonLoader.getSingletonInstance("dubboRouterZkClient");
         zkClient.create()
                 .creatingParentsIfNeeded()
                 .forPath(LISTEN_PATH + "/" + buildNodeName(applicationName, host));
     }
 
     public void removeRestartingInstance(String applicationName, String host) throws Exception {
-        final CuratorFramework zkClient = zookeeperClientInstanceExtensionLoader.getExtension("dubboRouter").getClient();
+        final CuratorFramework zkClient = singletonLoader.getSingletonInstance("dubboRouterZkClient");
         zkClient.delete()
                 .deletingChildrenIfNeeded()
                 .forPath(LISTEN_PATH + "/" + buildNodeName(applicationName, host));
