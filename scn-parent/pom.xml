@@ -9,19 +9,21 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>scn-common</module>
-        <module>scn-eureka-service-8761</module>
-        <module>scn-eureka-service-8762</module>
-        <module>scn-autodeliver-8091</module>
-        <module>scn-autodeliver-8092</module>
+        <module>scn-oauth-resource-api</module>
         <module>scn-resume-8081</module>
         <module>scn-resume-8082</module>
+        <module>scn-autodeliver-8091</module>
+        <module>scn-autodeliver-8092</module>
+        <module>scn-oauth-server-7101</module>
+        <module>scn-eureka-service-8761</module>
+        <module>scn-eureka-service-8762</module>
         <module>scn-hystrix-dashboard-9001</module>
         <module>scn-hystrix-turbine-9101</module>
         <module>scn-configserver-9201</module>
+        <module>scn-log-zipkin-9411</module>
         <module>scn-stream-producer-8101</module>
         <module>scn-stream-consumer-8111</module>
         <module>scn-stream-consumer-8112</module>
-        <module>scn-log-zipkin-9411</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -45,6 +47,17 @@
                 <version>Greenwich.RELEASE</version>
                 <type>pom</type>
                 <scope>import</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.springframework.security.oauth.boot</groupId>
+                        <artifactId>spring-security-oauth2-autoconfigure</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security.oauth.boot</groupId>
+                <artifactId>spring-security-oauth2-autoconfigure</artifactId>
+                <version>2.1.11.RELEASE</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
