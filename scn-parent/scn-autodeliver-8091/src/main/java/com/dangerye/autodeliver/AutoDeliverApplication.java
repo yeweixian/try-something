@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 @EnableDiscoveryClient
 @EnableCircuitBreaker
 //@SpringCloudApplication = 以上集合
-@EnableResourceServerClient
+//@EnableResourceServerClient
 public class AutoDeliverApplication {
     public static void main(String[] args) {
         SpringApplication.run(AutoDeliverApplication.class, args);

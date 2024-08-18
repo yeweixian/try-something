@@ -10,7 +10,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @EnableDiscoveryClient
 @EnableFeignClients
 //@SpringCloudApplication = 以上集合
-@EnableResourceServerClient
+//@EnableResourceServerClient
 public class AutoDeliverApplication {
     public static void main(String[] args) {
         SpringApplication.run(AutoDeliverApplication.class, args);
