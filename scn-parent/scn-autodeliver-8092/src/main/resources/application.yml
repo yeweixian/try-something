@@ -55,7 +55,9 @@ hystrix:
         isolation:
           thread:
             timeoutInMilliseconds: 15000  # Hystrix的超时时⻓设置 跟 ribbon ReadTimeout 进行对比取最小值 达到进入熔断逻辑;
-
+scn:
+  resources:
+    resourceId: autoDeliver
 #分布式链路追踪
 logging:
   level:

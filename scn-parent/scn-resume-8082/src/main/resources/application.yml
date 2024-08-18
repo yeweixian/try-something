@@ -1,2 +1,5 @@
 server:
   version: @project.version@
+scn:
+  resources:
+    resourceId: resume
