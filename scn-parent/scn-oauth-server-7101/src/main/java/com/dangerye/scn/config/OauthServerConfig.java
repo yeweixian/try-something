@@ -50,7 +50,7 @@ public class OauthServerConfig extends AuthorizationServerConfigurerAdapter {
         clients.inMemory()
                 .withClient("business_client")
                 .secret("business_secret")
-                .resourceIds("autoDeliver", "resume")
+                .resourceIds("scn-gateway")
                 .authorizedGrantTypes("password", "refresh_token")
                 .scopes("all");
     }
