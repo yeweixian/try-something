@@ -11,6 +11,7 @@ public class RestartingMain {
                 System.out.println(singletonLoader);
                 final RestartServiceRiskControlUtil riskControlUtil = singletonLoader.getSingletonInstance("restartServiceRiskControlUtil");
                 System.out.println(riskControlUtil);
+                riskControlUtil.createZkListener();
             }).start();
         }
     }
