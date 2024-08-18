@@ -1,5 +1,8 @@
 package com.dangerye.scn.config;
 
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -12,7 +15,12 @@ import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
 @Configuration
 @EnableResourceServer   // 开启资源服务器功能
 @EnableWebSecurity      // 开启web访问安全
+@EnableConfigurationProperties(ResourceConfig.class)
 public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
+
+    @Autowired
+    private ResourceConfig resourceConfig;
+
     /**
      * 用于定义资源服务器向远程认证服务器发起请求，进行token校验等事情
      */
@@ -24,7 +32,10 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
         remoteTokenServices.setClientId("business_client");
         remoteTokenServices.setClientSecret("business_secret");
         resources.tokenServices(remoteTokenServices);
-        // resources.resourceId() // 可以不用设置 也可以设置  -  resourceIds("autoDeliver", "resume")
+        if (StringUtils.isEmpty(resourceConfig.getResourceId())) {
+            throw new RuntimeException("ConfigurationProperties: scn.resources.resourceId not find...");
+        }
+        resources.resourceId(resourceConfig.getResourceId());
         super.configure(resources);
     }
 
