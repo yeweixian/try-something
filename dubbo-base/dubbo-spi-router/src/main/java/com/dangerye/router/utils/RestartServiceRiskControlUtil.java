@@ -39,6 +39,7 @@ public final class RestartServiceRiskControlUtil implements PathChildrenCacheLis
             final PathChildrenCache pathChildrenCache = new PathChildrenCache(zkClient, LISTEN_PATH, true);
             pathChildrenCache.getListenable().addListener(this);
             pathChildrenCache.start(PathChildrenCache.StartMode.POST_INITIALIZED_EVENT);
+            System.out.println("...RestartServiceRiskControlUtil.buildZkListener success...");
             return true;
         } catch (Exception e) {
             throw new RuntimeException(e);
