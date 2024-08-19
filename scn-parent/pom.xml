@@ -9,12 +9,13 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>scn-common</module>
+        <module>scn-oauth-server-7101</module>
         <module>scn-oauth-resource-api</module>
+        <module>scn-oauth-resource-server-8201</module>
         <module>scn-resume-8081</module>
         <module>scn-resume-8082</module>
         <module>scn-autodeliver-8091</module>
         <module>scn-autodeliver-8092</module>
-        <module>scn-oauth-server-7101</module>
         <module>scn-eureka-service-8761</module>
         <module>scn-eureka-service-8762</module>
         <module>scn-hystrix-dashboard-9001</module>

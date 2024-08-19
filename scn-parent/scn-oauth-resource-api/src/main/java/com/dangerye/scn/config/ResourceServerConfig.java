@@ -51,8 +51,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/autoDeliver/**").authenticated()
-                .antMatchers("/resume/**").authenticated()
+                .antMatchers("/rapi/**").authenticated()
                 .anyRequest().permitAll();
     }
 }
