@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.jwt.crypto.sign.MacSigner;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
@@ -13,12 +14,14 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
-import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
+import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
+import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
 @Configuration      // 当前为 oauth2 server 配置类
 @EnableAuthorizationServer      // 开启认证服务器功能
 public class OauthServerConfig extends AuthorizationServerConfigurerAdapter {
     private final Loader<TokenStore> tokenStoreLoader = new Loader<>();
+    private final Loader<JwtAccessTokenConverter> jwtAccessTokenConverterLoader = new Loader<>();
     private final Loader<AuthorizationServerTokenServices> tokenServicesLoader = new Loader<>();
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -72,6 +75,7 @@ public class OauthServerConfig extends AuthorizationServerConfigurerAdapter {
             final DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
             defaultTokenServices.setSupportRefreshToken(true);
             defaultTokenServices.setTokenStore(tokenStore());
+            defaultTokenServices.setTokenEnhancer(jwtAccessTokenConverter());
             defaultTokenServices.setAccessTokenValiditySeconds(30);
             defaultTokenServices.setRefreshTokenValiditySeconds(3 * 24 * 60 * 60);
             return defaultTokenServices;
@@ -79,6 +83,15 @@ public class OauthServerConfig extends AuthorizationServerConfigurerAdapter {
     }
 
     private TokenStore tokenStore() {
-        return tokenStoreLoader.getInstance(InMemoryTokenStore::new);
+        return tokenStoreLoader.getInstance(() -> new JwtTokenStore(jwtAccessTokenConverter()));
+    }
+
+    private JwtAccessTokenConverter jwtAccessTokenConverter() {
+        return jwtAccessTokenConverterLoader.getInstance(() -> {
+            final JwtAccessTokenConverter jwtAccessTokenConverter = new JwtAccessTokenConverter();
+            jwtAccessTokenConverter.setSigningKey("signingKey");
+            jwtAccessTokenConverter.setVerifier(new MacSigner("signingKey"));
+            return jwtAccessTokenConverter;
+        });
     }
 }
