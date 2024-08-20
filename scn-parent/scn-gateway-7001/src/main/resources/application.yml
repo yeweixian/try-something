@@ -17,6 +17,10 @@ spring:
           uri: lb://scn-oauth-server
           predicates:
             - Path=/oauth/**
+        - id: scn-oauth-resource-server-router
+          uri: lb://scn-oauth-resource-server
+          predicates:
+            - Path=/papi/**,/rapi/**
         - id: autoDeliver-application-router-with-filter
           uri: lb://autoDeliver-application
           predicates:
