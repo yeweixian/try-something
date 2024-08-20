@@ -43,6 +43,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //        auth.inMemoryAuthentication()
 //                .withUser(userDetails)
 //                .passwordEncoder(passwordEncoder());
-        auth.userDetailsService(jdbcUserDetailsService);
+        auth.userDetailsService(jdbcUserDetailsService).passwordEncoder(passwordEncoder());
     }
 }
