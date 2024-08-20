@@ -13,16 +13,10 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: autoDeliver-application-router
-          # uri: http://127.0.0.1:8091
-          uri: lb://autoDeliver-application
+        - id: scn-oauth-server-router
+          uri: lb://scn-oauth-server
           predicates:
-            - Path=/autoDeliver/**
-        - id: resume-application-router
-          # uri: http://127.0.0.1:8081
-          uri: lb://resume-application
-          predicates:
-            - Path=/resume/**
+            - Path=/oauth/**
         - id: autoDeliver-application-router-with-filter
           uri: lb://autoDeliver-application
           predicates:
