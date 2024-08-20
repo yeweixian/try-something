@@ -1,14 +1,13 @@
 package com.dangerye.scn.config;
 
+import com.dangerye.scn.service.JdbcUserDetailsService;
 import com.dangerye.scn.utils.Loader;
-import org.assertj.core.util.Lists;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -18,6 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final Loader<PasswordEncoder> passwordEncoderLoader = new Loader<>();
+    @Autowired
+    private JdbcUserDetailsService jdbcUserDetailsService;
 
     /**
      * 注册一个认证管理器对象到 spring 容器里
@@ -38,9 +39,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        UserDetails userDetails = new User("admin", "123456", Lists.emptyList());
-        auth.inMemoryAuthentication()
-                .withUser(userDetails)
-                .passwordEncoder(passwordEncoder());
+//        UserDetails userDetails = new User("admin", "123456", Collections.emptyList());
+//        auth.inMemoryAuthentication()
+//                .withUser(userDetails)
+//                .passwordEncoder(passwordEncoder());
+        auth.userDetailsService(jdbcUserDetailsService);
     }
 }
