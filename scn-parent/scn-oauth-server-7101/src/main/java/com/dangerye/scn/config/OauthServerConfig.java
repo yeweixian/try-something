@@ -30,6 +30,8 @@ public class OauthServerConfig extends AuthorizationServerConfigurerAdapter {
     private final Loader<JdbcClientDetailsService> jdbcClientDetailsServiceLoader = new Loader<>();
     @Autowired
     private AuthenticationManager authenticationManager;
+    @Autowired
+    private ExtensionAccessTokenConverter extensionAccessTokenConverter;
     // @Autowired
     // private DataSource dataSource;
 
@@ -70,10 +72,9 @@ public class OauthServerConfig extends AuthorizationServerConfigurerAdapter {
     /**
      * JdbcClientDetailsService 中包含表及字段信息;
 
-    @Bean
-    public JdbcClientDetailsService jdbcClientDetailsService() {
-        return jdbcClientDetailsServiceLoader.getInstance(() -> new JdbcClientDetailsService(dataSource));
-    }*/
+     @Bean public JdbcClientDetailsService jdbcClientDetailsService() {
+     return jdbcClientDetailsServiceLoader.getInstance(() -> new JdbcClientDetailsService(dataSource));
+     }*/
 
     /**
      * 配置 token 令牌相关的 方法
@@ -108,6 +109,7 @@ public class OauthServerConfig extends AuthorizationServerConfigurerAdapter {
             final JwtAccessTokenConverter jwtAccessTokenConverter = new JwtAccessTokenConverter();
             jwtAccessTokenConverter.setSigningKey("signingKey");
             jwtAccessTokenConverter.setVerifier(new MacSigner("signingKey"));
+            jwtAccessTokenConverter.setAccessTokenConverter(extensionAccessTokenConverter);
             return jwtAccessTokenConverter;
         });
     }
