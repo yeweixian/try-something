@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -20,11 +21,14 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 @EnableResourceServer   // 开启资源服务器功能
 @EnableWebSecurity      // 开启web访问安全
 @EnableConfigurationProperties(ResourceConfig.class)
+@Import(ExtensionAccessTokenConverter.class)
 public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
     private final Loader<TokenStore> tokenStoreLoader = new Loader<>();
     private final Loader<JwtAccessTokenConverter> jwtAccessTokenConverterLoader = new Loader<>();
     @Autowired
     private ResourceConfig resourceConfig;
+    @Autowired
+    private ExtensionAccessTokenConverter extensionAccessTokenConverter;
 
     /**
      * 用于定义资源服务器向远程认证服务器发起请求，进行token校验等事情
@@ -54,6 +58,7 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
             final JwtAccessTokenConverter jwtAccessTokenConverter = new JwtAccessTokenConverter();
             jwtAccessTokenConverter.setSigningKey("signingKey");
             jwtAccessTokenConverter.setVerifier(new MacSigner("signingKey"));
+            jwtAccessTokenConverter.setAccessTokenConverter(extensionAccessTokenConverter);
             return jwtAccessTokenConverter;
         });
     }
