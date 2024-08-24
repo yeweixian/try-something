@@ -1,0 +1,18 @@
+server:
+  port: 8082
+spring:
+  application:
+    name: resume-application
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+# 开启健康检查接口 /actuator/health
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
