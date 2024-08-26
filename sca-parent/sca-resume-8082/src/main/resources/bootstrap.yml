@@ -7,6 +7,11 @@ spring:
     nacos:
       discovery:
         server-addr: localhost:8848
+      config:
+        server-addr: localhost:8848
+        namespace: 80fe6ffd-a6f5-48b5-899f-9b8f0c15deb8
+        group: DEFAULT_GROUP
+        file-extension: yaml
 # 开启健康检查接口 /actuator/health
 management:
   endpoints:
