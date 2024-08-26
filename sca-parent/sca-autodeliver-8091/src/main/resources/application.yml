@@ -28,23 +28,6 @@ resume-application:
     MaxAutoRetries: 0 #对当前选中实例重试次数，
     MaxAutoRetriesNextServer: 0 #切换实例的重试次数
     NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RoundRobinRule #负载策略调整
-feign:
-  hystrix:
-    enabled: true
-  compression:
-    request:
-      enabled: true
-      mime-types: text/html,application/xml,application/json # 设置压缩的数据类型，此处也是默认值
-      min-request-size: 2048 # 设置触发压缩的大小下限，此处也是默认值
-    response:
-      enabled: true # 开启响应压缩
-hystrix:
-  command:
-    default:
-      execution:
-        isolation:
-          thread:
-            timeoutInMilliseconds: 15000  # Hystrix的超时时⻓设置 跟 ribbon ReadTimeout 进行对比取最小值 达到进入熔断逻辑;
 #分布式链路追踪
 logging:
   level:
