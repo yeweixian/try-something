@@ -7,6 +7,10 @@ spring:
     nacos:
       discovery:
         server-addr: localhost:8848
+    sentinel:
+      transport:
+        dashboard: localhost:8080
+        port: 8719
 # 开启健康检查接口 /actuator/health
 management:
   endpoints:
