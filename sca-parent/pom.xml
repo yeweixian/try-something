@@ -8,6 +8,11 @@
     <artifactId>sca-parent</artifactId>
     <version>1.0-SNAPSHOT</version>
     <modules>
+        <module>sca-dubbo-service-api</module>
+        <module>sca-dubbo-resume-8083</module>
+        <module>sca-dubbo-resume-8084</module>
+        <module>sca-dubbo-autodeliver-8093</module>
+        <module>sca-dubbo-autodeliver-8094</module>
         <module>sca-autodeliver-8091</module>
         <module>sca-autodeliver-8092</module>
         <module>sca-resume-8081</module>
